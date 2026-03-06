@@ -3,19 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Baltaanay</title>
+    <title>Balta Media</title>
+    <!-- Tailwind y fuentes -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <!-- Estilos personalizados -->
     <link rel="stylesheet" href="/styles.css">
 </head>
-<body>
-    <header>
-        <nav>
-            <a href="/" data-link>Inicio</a>
-            <a href="/biblioteca" data-link>Biblioteca</a>
-            <a href="/explorar" data-link>Explorar</a>
-            <a href="/buscar" data-link>Buscar</a>
-        </nav>
+<body class="bg-[#050505] text-white font-[Plus_Jakarta_Sans] overflow-x-hidden">
+    <!-- HEADER (siempre visible, puede ocultarse con clase .header-hidden) -->
+    <header id="main-header" class="sticky top-0 z-50 bg-[#050505]/80 backdrop-blur-xl border-b border-white/5 transition-opacity duration-300">
+        <div class="max-w-[1600px] mx-auto px-6 py-4 flex items-center justify-between">
+            <!-- Logo -->
+            <a href="/" class="flex items-center gap-2" data-link>
+                <img src="https://media.baltaanay.org/web/image/885-f3d79ca9/xhbalta-aula.png" alt="Balta Media" class="w-8 h-8 rounded-lg object-cover" loading="lazy">
+                <span class="text-xl font-bold text-white">Media</span>
+            </a>
+
+            <!-- Búsqueda escritorio -->
+            <div class="hidden lg:flex items-center gap-4 desktop-search-container">
+                <div class="relative">
+                    <input type="text" id="desktopSearch" placeholder="Buscar episodios, series..." class="bg-white/10 border border-white/20 rounded-full px-4 py-2 pl-10 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <img src="https://media.baltaanay.org/web/image/793-902e5b33/Search%20%282%29.png" alt="Buscar" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" loading="lazy">
+                </div>
+                <div class="desktop-search-results" id="desktopSearchResults">
+                    <div id="desktopSearchResultsContent"></div>
+                </div>
+                <a href="/my/home" class="text-sm font-bold text-gray-400 hover:text-white">Iniciar sesión</a>
+            </div>
+
+            <!-- Iconos derecha -->
+            <div class="flex items-center gap-4">
+                <button onclick="window.toggleMobileSearch?.()" class="lg:hidden text-gray-400 hover:text-white">
+                    <img src="https://media.baltaanay.org/web/image/793-902e5b33/Search%20%282%29.png" alt="Buscar" class="w-5 h-5" loading="lazy">
+                </button>
+                <a href="/novedades" class="relative text-gray-400 hover:text-white">
+                    <img src="https://media.baltaanay.org/web/image/796-aee658de/Explore.png" alt="Notificaciones" class="w-5 h-5" loading="lazy">
+                    <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                </a>
+                <a href="/my/home" class="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full overflow-hidden">
+                    <img src="https://media.baltaanay.org/web/image/793-902e5b33/Search%20%282%29.png" alt="Usuario" class="w-full h-full object-cover" loading="lazy">
+                </a>
+            </div>
+        </div>
     </header>
-    <main id="content"></main>
+
+    <!-- Búsqueda móvil (inicialmente oculta) -->
+    <div id="mobileSearchBar" class="lg:hidden bg-[#050505] p-4 border-b border-white/10 hidden">
+        <div class="flex items-center gap-3">
+            <img src="https://media.baltaanay.org/web/image/793-902e5b33/Search%20%282%29.png" alt="Buscar" class="w-5 h-5" loading="lazy">
+            <input type="text" id="mobileSearchInput" placeholder="Buscar episodios, series..." class="flex-1 bg-transparent border-none text-white text-lg focus:outline-none placeholder-gray-500">
+            <button onclick="window.handleMobileSearchButton?.()" class="text-white px-3 py-1 bg-blue-600 rounded-md text-sm">Buscar</button>
+            <button onclick="window.toggleMobileSearch?.()" class="text-white text-xl">×</button>
+        </div>
+        <div id="mobileSearchResults" class="mt-4 max-h-[60vh] overflow-y-auto"></div>
+    </div>
+    <div id="searchOverlay" class="search-overlay" onclick="window.closeSearch?.()"></div>
+
+    <!-- CATEGORY PILLS (se rellenan dinámicamente desde show.js) -->
+    <div id="category-filters" class="sticky top-[73px] z-40 bg-[#050505]/95 backdrop-blur-xl border-b border-white/5">
+        <div class="py-3 overflow-x-auto no-scrollbar">
+            <div class="max-w-[1600px] mx-auto px-6 flex items-center gap-3" id="category-pills"></div>
+        </div>
+    </div>
+
+    <!-- CONTENEDOR PRINCIPAL (donde se inyectan las vistas) -->
+    <main id="content" class="max-w-[1600px] mx-auto px-6 mt-4 min-h-screen"></main>
+
+    <!-- Script principal (tipo módulo) -->
     <script type="module" src="/main.js"></script>
 </body>
 </html>
