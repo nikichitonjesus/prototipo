@@ -1,0 +1,32 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+}
+header {
+    background: #333;
+    color: white;
+    padding: 1rem;
+}
+header nav a {
+    color: white;
+    margin-right: 1rem;
+    text-decoration: none;
+}
+#content {
+    padding: 1rem;
+}
+/* estilos para episodios, carruseles, etc. */
+.episodio-card {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+.carrusel {
+    display: flex;
+    overflow-x: auto;
+}
+.carrusel-item {
+    flex: 0 0 200px;
+    margin-right: 1rem;
+}
