@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Balta Media</title>
+    <title>Balta Media · Conocimiento en acción</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Fuentes -->
@@ -16,7 +16,7 @@
 </head>
 <body class="bg-[#050505] text-white font-[Plus_Jakarta_Sans] overflow-x-hidden">
 
-<!-- Search overlay (para móvil) -->
+<!-- Search overlay (para móvil) - ya no se usa, pero lo dejamos por si acaso -->
 <div class="search-overlay" id="searchOverlay"></div>
 
 <!-- Header principal (sticky) -->
@@ -27,23 +27,10 @@
             <span class="text-lg sm:text-xl font-bold text-white">Balta Media</span>
         </a>
 
-        <!-- Búsqueda desktop -->
-        <div class="hidden lg:flex items-center gap-4 desktop-search-container">
-            <div class="relative">
-                <input type="text" id="desktopSearch" placeholder="Buscar episodios, series..." class="bg-white/10 border border-white/20 rounded-full px-4 py-2 pl-10 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <img src="https://media.baltaanay.org/web/image/793-902e5b33/Search%20%282%29.png" alt="Buscar" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" loading="lazy">
-            </div>
-            <div class="desktop-search-results" id="desktopSearchResults">
-                <div id="desktopSearchResultsContent"></div>
-            </div>
-            <a href="/my/home" class="text-sm font-bold text-gray-400 hover:text-white">Iniciar sesión</a>
-        </div>
+        <!-- Sin búsqueda en el header -->
 
         <!-- Iconos derecha -->
         <div class="flex items-center gap-3 sm:gap-4">
-            <button id="mobileSearchToggle" class="lg:hidden text-gray-400 hover:text-white">
-                <img src="https://media.baltaanay.org/web/image/793-902e5b33/Search%20%282%29.png" alt="Buscar" class="w-5 h-5" loading="lazy">
-            </button>
             <a href="/novedades" class="relative text-gray-400 hover:text-white" data-link>
                 <img src="https://media.baltaanay.org/web/image/796-aee658de/Explore.png" alt="Novedades" class="w-5 h-5" loading="lazy">
                 <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
@@ -54,17 +41,6 @@
         </div>
     </div>
 </header>
-
-<!-- Barra de búsqueda móvil (oculta inicialmente) -->
-<div id="mobileSearchBar" class="lg:hidden bg-[#050505] p-4 border-b border-white/10">
-    <div class="flex items-center gap-3">
-        <img src="https://media.baltaanay.org/web/image/793-902e5b33/Search%20%282%29.png" alt="Buscar" class="w-5 h-5" loading="lazy">
-        <input type="text" id="mobileSearchInput" placeholder="Buscar episodios, series..." class="flex-1 bg-transparent border-none text-white text-base sm:text-lg focus:outline-none placeholder-gray-500">
-        <button id="mobileSearchButton" class="text-white px-3 py-1 bg-blue-600 rounded-md text-sm">Buscar</button>
-        <button id="mobileSearchClose" class="text-white text-xl">×</button>
-    </div>
-    <div id="mobileSearchResults" class="mt-4 max-h-[60vh] overflow-y-auto"></div>
-</div>
 
 <!-- Barra de categorías (sticky) -->
 <div class="sticky top-0 z-40 bg-[#050505]/95 backdrop-blur-xl border-b border-white/5" id="category-filters">
@@ -91,34 +67,5 @@
 
 <!-- Script principal (tipo módulo) -->
 <script type="module" src="/main.js"></script>
-<!-- Script de búsqueda y categorías (se integra en main.js, pero dejamos funciones globales para eventos) -->
-<script>
-    // Funciones de búsqueda (serán implementadas en main.js, pero aquí se definen para eventos inline)
-    window.toggleMobileSearch = function() {
-        const el = document.getElementById('mobileSearchBar');
-        const overlay = document.getElementById('searchOverlay');
-        if (!el || !overlay) return;
-        if (el.classList.contains('open')) {
-            el.classList.remove('open');
-            overlay.classList.remove('active');
-            document.getElementById('mobileSearchInput').value = '';
-            document.getElementById('mobileSearchResults').innerHTML = '';
-        } else {
-            el.classList.add('open');
-            overlay.classList.add('active');
-            document.getElementById('mobileSearchInput').focus();
-        }
-    };
-
-    window.closeSearch = function() {
-        document.getElementById('mobileSearchBar')?.classList.remove('open');
-        document.getElementById('searchOverlay')?.classList.remove('active');
-    };
-
-    // Event listeners para búsqueda móvil
-    document.getElementById('mobileSearchToggle')?.addEventListener('click', window.toggleMobileSearch);
-    document.getElementById('mobileSearchClose')?.addEventListener('click', window.toggleMobileSearch);
-    document.getElementById('searchOverlay')?.addEventListener('click', window.closeSearch);
-</script>
 </body>
 </html>
