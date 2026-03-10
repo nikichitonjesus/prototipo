@@ -323,3 +323,61 @@
     width: 0%;
     border-radius: 2px;
 }
+/* styles.css - añadir al final */
+
+/* Forzar iconos blancos en todas partes */
+.icon-white {
+    filter: brightness(0) invert(1);
+}
+
+/* Para los botones que usan imágenes sin clase, también aplicar */
+.podcast-icon-btn img,
+.episode-action-btn img,
+.episode-play-btn img,
+.podcast-last-episode-btn img,
+.action-icon,
+.play-icon-lg,
+.play-icon-sm,
+.mobile-play-button img {
+    filter: brightness(0) invert(1);
+}
+
+/* Excepciones: algunos iconos ya son blancos por naturaleza, pero no importa */
+
+/* Ajustes de ancho completo para vistas de detalle */
+.detail-full-width {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+}
+
+.detail-full-width .podcast-header {
+    border-radius: 0 !important;
+}
+
+.detail-full-width .podcast-episodes-list {
+    margin-left: auto;
+    margin-right: auto;
+    width: 95%;
+    max-width: 1600px;
+}
+
+/* Ajustar el contenido dentro del header para que esté centrado */
+.podcast-header .max-w-\[1600px\] {
+    max-width: 1600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Para que la barra de categorías no se superponga con el header al hacer scroll */
+#category-filters {
+    top: 0;
+}
+
+/* Ajuste del sticky header cuando se oculta */
+#main-header {
+    transition: opacity 0.3s ease;
+}
