@@ -1,7 +1,7 @@
 // main.js - Router principal
 
 import { DATA, renderFeed, renderGrid, renderEpisodio, renderSerie } from './show.js';
-import { getEpisodioByDetailUrl, getSerieByUrl, getEpisodiosBySerieUrl } from './episodios.js';
+import { getEpisodioByDetailUrl, getSerieByUrl } from './episodios.js';
 import './player.js';
 
 // Páginas especiales
@@ -20,7 +20,7 @@ async function router() {
     const header = document.getElementById('main-header');
     const categoryFilters = document.getElementById('category-filters');
 
-    // Mostrar header por defecto
+    // Mostrar header y filtros por defecto
     if (header) header.classList.remove('hidden');
     if (categoryFilters) categoryFilters.classList.remove('hidden');
 
@@ -44,26 +44,20 @@ async function router() {
         return;
     }
 
-    // 3. Búsqueda
-    if (path === '/buscar' && searchParams.has('q')) {
-        const query = searchParams.get('q');
-        const term = query.toLowerCase().trim();
-        const results = DATA.filter(ep =>
-            ep.title.toLowerCase().includes(term) ||
-            ep.author.toLowerCase().includes(term) ||
-            ep.categories.some(c => c.toLowerCase().includes(term)) ||
-            ep.description.toLowerCase().includes(term)
-        );
-        renderGrid(container, results, `Resultados para "${query}"`);
-        document.title = `Búsqueda: ${query} · Balta Media`;
+    // 3. Búsqueda (con o sin query)
+    if (path === '/buscar') {
+        const query = searchParams.get('q') || '';
+        const buscarModule = await import('./buscar.js');
+        buscarModule.renderSearch(container, query);
+        document.title = query ? `Búsqueda: ${query} · Balta Media` : 'Buscar · Balta Media';
         return;
     }
 
     // 4. Categoría
     if (path.startsWith('/categoria/')) {
         const cat = decodeURIComponent(path.replace('/categoria/', ''));
-        const results = DATA.filter(ep => ep.categories.includes(cat));
-        renderGrid(container, results, cat);
+        const buscarModule = await import('./buscar.js');
+        buscarModule.renderCategory(container, cat);
         document.title = `${cat} · Balta Media`;
         return;
     }
@@ -84,7 +78,7 @@ async function router() {
         return;
     }
 
-    // 7. Novedades (ruta especial)
+    // 7. Novedades
     if (path === '/novedades') {
         const sorted = [...DATA].sort((a, b) => new Date(b.date) - new Date(a.date));
         const recientes = sorted.slice(0, 20);
@@ -131,19 +125,16 @@ window.addEventListener('popstate', router);
 window.addEventListener('scroll', () => {
     const st = window.pageYOffset || document.documentElement.scrollTop;
     const topHeader = document.getElementById('main-header');
-    const mobileSearch = document.getElementById('mobileSearchBar');
-    if (!topHeader || !mobileSearch) return;
+    const categoryFilters = document.getElementById('category-filters');
+    if (!topHeader || !categoryFilters) return;
 
     if (st > lastScrollTop && st > 100) {
         topHeader.style.opacity = '0';
         topHeader.style.pointerEvents = 'none';
-        mobileSearch.style.opacity = '0';
-        mobileSearch.style.pointerEvents = 'none';
+        // La barra de categorías se queda fija (sticky), no la ocultamos
     } else {
         topHeader.style.opacity = '1';
         topHeader.style.pointerEvents = 'auto';
-        mobileSearch.style.opacity = '1';
-        mobileSearch.style.pointerEvents = 'auto';
     }
     lastScrollTop = st <= 0 ? 0 : st;
 });
