@@ -1,4 +1,4 @@
-// show.js - Vistas del feed, episodio, serie, etc.
+// show.js - Vistas del feed, episodio, serie, etc. - VERSIÓN PROFESIONALIZADA
 
 import { getAllEpisodios, getSerieById, getEpisodiosBySerieId, getEpisodiosConSerie } from './episodios.js';
 import { userStorage } from './storage.js';
@@ -81,7 +81,7 @@ export function createStandardCard(ep) {
     const dlIcon = ep.allowDownload ? ICONS.dl : ICONS.noDl;
 
     return `<div class="card-std group" data-episodio-id="${ep.id}">
-        <div class="relative w-full aspect-square rounded-xl overflow-hidden bg-zinc-800" onclick="window.goToDetail('${ep.detailUrl}')">
+        <div class="relative w-full aspect-square rounded-xl overflow-hidden bg-zinc-800 cursor-pointer" onclick="window.goToDetail('${ep.detailUrl}')">
             <img src="${ep.coverUrl}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
             <div class="overlay-full">
                 <img src="${addIcon}" class="action-icon" onclick="window.handleAdd(event, '${ep.id}'); return false;" data-episodio-id="${ep.id}" data-added="${inPlaylist}">
@@ -92,8 +92,8 @@ export function createStandardCard(ep) {
                 <img src="${ICONS.play}" alt="Play">
             </div>
         </div>
-        <div onclick="window.goToDetail('${ep.detailUrl}')">
-            <h3 class="font-bold text-white text-sm truncate">${ep.title}</h3>
+        <div onclick="window.goToDetail('${ep.detailUrl}')" class="cursor-pointer">
+            <h3 class="font-bold text-white text-sm truncate hover:text-blue-400 transition-colors">${ep.title}</h3>
             <p class="text-xs text-gray-400 mt-1 truncate">${ep.author}</p>
         </div>
     </div>`;
@@ -116,7 +116,7 @@ export function createVideoExpand(ep) {
         <div class="mobile-play-button z-30" onclick="window.handlePlay(event, '${ep.id}'); return false;">
             <img src="${ICONS.play}" alt="Play">
         </div>
-        <div class="absolute bottom-2 left-2 z-20 bg-black/60 px-2 py-0.5 rounded text-[10px] font-bold">VIDEO</div>
+        <div class="absolute bottom-2 left-2 z-20 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold border border-white/10">VIDEO</div>
     </div>`;
 }
 
@@ -125,20 +125,20 @@ export function createListItem(ep, idx) {
     const addIcon = inPlaylist ? ICONS.added : ICONS.add;
 
     return `<div class="list-item group" data-episodio-id="${ep.id}">
-        <span class="text-gray-500 font-bold w-4 text-center text-sm">${idx + 1}</span>
-        <div class="relative w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 rounded overflow-hidden" onclick="window.goToDetail('${ep.detailUrl}')">
+        <span class="text-gray-500 font-bold w-6 text-center text-sm">${idx + 1}</span>
+        <div class="relative w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 rounded-lg overflow-hidden cursor-pointer" onclick="window.goToDetail('${ep.detailUrl}')">
             <img src="${ep.coverUrl}" class="w-full h-full object-cover" loading="lazy">
             <div class="overlay-mini" onclick="window.handlePlay(event, '${ep.id}'); return false;"><img src="${ICONS.play}" class="play-icon-sm"></div>
         </div>
-        <div class="item-content" onclick="window.goToDetail('${ep.detailUrl}')">
-            <h4 class="font-bold text-sm truncate text-white">${ep.title}</h4>
+        <div class="item-content cursor-pointer flex-1 min-w-0" onclick="window.goToDetail('${ep.detailUrl}')">
+            <h4 class="font-bold text-sm truncate text-white group-hover:text-blue-400 transition-colors">${ep.title}</h4>
             <p class="text-xs text-gray-500 truncate">${ep.author}</p>
         </div>
-        <div class="item-actions">
-            <button class="lg:opacity-0 lg:group-hover:opacity-100 transition-opacity" onclick="window.handleAdd(event, '${ep.id}'); return false;">
-                <img src="${addIcon}" alt="Agregar" class="w-5 h-5" data-episodio-id="${ep.id}" data-added="${inPlaylist}">
+        <div class="item-actions flex items-center gap-2 flex-shrink-0">
+            <button class="lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-200 w-8 h-8 rounded-lg bg-black/40 backdrop-blur-sm border border-white/10 hover:bg-white/20 flex items-center justify-center" onclick="window.handleAdd(event, '${ep.id}'); return false;">
+                <img src="${addIcon}" alt="Agregar" class="w-4 h-4" data-episodio-id="${ep.id}" data-added="${inPlaylist}">
             </button>
-            <div class="lg:hidden mobile-play-button" style="position: static; width: 32px; height: 32px;" onclick="window.handlePlay(event, '${ep.id}'); return false;">
+            <div class="lg:hidden mobile-play-btn w-8 h-8 rounded-lg bg-[#7b2eda] flex items-center justify-center" onclick="window.handlePlay(event, '${ep.id}'); return false;">
                 <img src="${ICONS.play}" alt="Play" class="w-4 h-4">
             </div>
         </div>
@@ -152,7 +152,7 @@ export function createGridCard(item) {
 
     return `
         <div class="grid-card group" data-episodio-id="${item.id}">
-            <div class="aspect-square bg-zinc-800 relative" onclick="window.goToDetail('${item.detailUrl}')">
+            <div class="aspect-square bg-zinc-800 relative rounded-xl overflow-hidden cursor-pointer" onclick="window.goToDetail('${item.detailUrl}')">
                 <img src="${item.coverUrl}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
                 <div class="overlay-full">
                     <img src="${addIcon}" class="action-icon" onclick="window.handleAdd(event, '${item.id}'); return false;" data-episodio-id="${item.id}" data-added="${inPlaylist}">
@@ -163,15 +163,15 @@ export function createGridCard(item) {
                     <img src="${ICONS.play}" alt="Play">
                 </div>
             </div>
-            <div onclick="window.goToDetail('${item.detailUrl}')">
-                <h4 class="font-bold text-sm text-white truncate">${item.title}</h4>
+            <div onclick="window.goToDetail('${item.detailUrl}')" class="cursor-pointer">
+                <h4 class="font-bold text-sm text-white truncate hover:text-blue-400 transition-colors">${item.title}</h4>
                 <p class="text-xs text-gray-500 truncate">${item.author}</p>
             </div>
         </div>
     `;
 }
 
-// ---------- CARRUSELES (no se exportan, solo uso interno) ----------
+// ---------- CARRUSELES ----------
 function createCarousel(title, type, items, categoryContext) {
     if (!items || items.length === 0) return '';
 
@@ -185,7 +185,7 @@ function createCarousel(title, type, items, categoryContext) {
     } else if (type === 'list') {
         content = `<div id="${id}" class="flex gap-4 sm:gap-8 overflow-x-auto no-scrollbar scroll-smooth pb-4">`;
         for (let i = 0; i < items.length; i += 4) {
-            content += `<div class="card-list-group min-w-[300px] sm:min-w-[340px]">` +
+            content += `<div class="card-list-group min-w-[300px] sm:min-w-[340px] space-y-3">` +
                 (items[i] ? createListItem(items[i], i) : '') +
                 (items[i+1] ? createListItem(items[i+1], i+1) : '') +
                 (items[i+2] ? createListItem(items[i+2], i+2) : '') +
@@ -205,8 +205,8 @@ function createCarousel(title, type, items, categoryContext) {
 
     return `<section class="carousel-wrapper relative group/section mb-8 sm:mb-12">
         <div class="flex items-end justify-between mb-3 sm:mb-5 px-1">
-            <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-white hover:text-blue-500 transition-colors">${title}</h2>
-            <button onclick="window.location.href='/categoria/${encodeURIComponent(categoryContext)}'" class="text-xs font-bold text-gray-500 uppercase tracking-wider hover:text-white">Ver todo</button>
+            <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-white hover:text-blue-400 transition-colors cursor-default">${title}</h2>
+            <button onclick="window.location.href='/categoria/${encodeURIComponent(categoryContext)}'" class="text-xs font-bold text-gray-500 uppercase tracking-wider hover:text-white transition-colors">Ver todo</button>
         </div>
         <div class="relative">
             <div class="nav-btn left" onclick="document.getElementById('${id}').scrollLeft -= 600"><button>❮</button></div>
@@ -241,27 +241,28 @@ function createSeriesCarousel() {
         if (!s || group.episodes.length < 1) return;
 
         content += `<div class="card-list-group min-w-[300px] sm:min-w-[340px]">
-            <div class="mb-4 cursor-pointer" onclick="window.goToDetail('${s.url_serie}')">
+            <div class="mb-4 cursor-pointer group/serie" onclick="window.goToDetail('${s.url_serie}')">
                 <div class="relative w-full aspect-square rounded-xl overflow-hidden bg-zinc-800">
-                    <img src="${s.portada_serie}" class="w-full h-full object-cover" loading="lazy">
+                    <img src="${s.portada_serie}" class="w-full h-full object-cover group-hover/serie:scale-105 transition-transform duration-500" loading="lazy">
                 </div>
-                <h3 class="font-bold text-white text-sm truncate mt-2">${s.titulo_serie}</h3>
-                <p class="text-xs text-gray-400">ver serie</p>
-            </div>`;
-
-        group.episodes.slice(0, 4).forEach((ep, i) => {
-            content += createListItem(ep, i);
-        });
-
-        content += `</div>`;
+                <h3 class="font-bold text-white text-sm truncate mt-2 group-hover/serie:text-blue-400 transition-colors">${s.titulo_serie}</h3>
+                <p class="text-xs text-gray-400 flex items-center gap-1">
+                    <span>ver serie</span>
+                    <span class="text-blue-400">→</span>
+                </p>
+            </div>
+            <div class="space-y-3">
+                ${group.episodes.slice(0, 4).map((ep, i) => createListItem(ep, i)).join('')}
+            </div>
+        </div>`;
     });
 
     content += `</div>`;
 
     return `<section class="carousel-wrapper relative group/section mb-8 sm:mb-12">
         <div class="flex items-end justify-between mb-3 sm:mb-5 px-1">
-            <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-white hover:text-blue-500 transition-colors">Series y Cursos Académicos</h2>
-            <button class="text-xs font-bold text-gray-500 uppercase tracking-wider hover:text-white">Ver todo</button>
+            <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-white hover:text-blue-400 transition-colors cursor-default">Series y Cursos Académicos</h2>
+            <button class="text-xs font-bold text-gray-500 uppercase tracking-wider hover:text-white transition-colors">Ver todo</button>
         </div>
         <div class="relative">
             <div class="nav-btn left" onclick="document.getElementById('${id}').scrollLeft -= 600"><button>❮</button></div>
@@ -271,7 +272,7 @@ function createSeriesCarousel() {
     </section>`;
 }
 
-// ---------- VISTAS DE DETALLE (con correcciones de ancho e iconos) ----------
+// ---------- VISTAS DE DETALLE PROFESIONALIZADAS ----------
 export function renderEpisodio(container, episodioId) {
     const ep = DATA.find(e => e.id === episodioId);
     if (!ep) {
@@ -283,55 +284,79 @@ export function renderEpisodio(container, episodioId) {
     const addIcon = inPlaylist ? ICONS.added : ICONS.add;
 
     const html = `
-        <div class="detail-full-width">
-            <div class="podcast-header relative rounded-none overflow-hidden mb-8 w-full">
-                <div class="podcast-header-bg absolute inset-0 bg-cover bg-center filter blur-2xl brightness-70 scale-110" style="background-image: url('${ep.coverUrl}');"></div>
-                <div class="relative z-10 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-8 min-h-[300px] flex items-end">
-                    <div class="flex items-end gap-8 max-w-[1600px] mx-auto w-full px-4">
-                        <img src="${ep.coverUrl}" class="w-40 h-40 rounded-[32px] object-cover shadow-2xl" alt="cover">
-                        <div>
-                            <h1 class="text-4xl font-extrabold">${ep.title}</h1>
-                            <p class="text-lg text-gray-300 mt-2">${ep.author}</p>
-                            <p class="text-gray-400 mt-3 max-w-2xl">${ep.description}</p>
-                        </div>
+        <div class="detail-view w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <!-- Header adaptable: mobile vs desktop -->
+            <div class="episode-header mb-8">
+                <!-- Versión móvil (stack vertical) -->
+                <div class="block lg:hidden">
+                    <div class="relative w-full aspect-square max-w-[300px] mx-auto mb-6 rounded-3xl overflow-hidden shadow-2xl">
+                        <img src="${ep.coverUrl}" class="w-full h-full object-cover" alt="${ep.title}">
                     </div>
-                </div>
-                <div class="relative z-10 flex justify-between items-center px-8 pb-8 max-w-[1600px] mx-auto w-full">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-2xl overflow-hidden bg-white/10">
-                            <img src="${ep.coverUrl}" class="w-full h-full object-cover">
-                        </div>
-                        <button class="podcast-icon-btn w-12 h-12 rounded-2xl bg-black/40 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-white/30 transition" onclick="window.handleAdd(event, '${ep.id}')">
+                    <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2">${ep.title}</h1>
+                    <p class="text-lg text-gray-300 mb-3">${ep.author}</p>
+                    <p class="text-gray-400 mb-6 leading-relaxed">${ep.description}</p>
+                    
+                    <!-- Barra de acciones móvil -->
+                    <div class="flex items-center gap-3 mb-8">
+                        <button class="flex-1 bg-[#7b2eda] hover:bg-[#8f3ef0] rounded-2xl py-4 px-6 flex items-center justify-center gap-3 transition transform hover:scale-[1.02]" onclick="window.handlePlay(event, '${ep.id}')">
+                            <img src="${ICONS.play}" class="w-6 h-6 icon-white">
+                            <span class="font-bold">Reproducir</span>
+                        </button>
+                        <button class="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-white/20 transition" onclick="window.handleAdd(event, '${ep.id}')">
                             <img src="${addIcon}" class="w-6 h-6 icon-white">
                         </button>
-                        <button class="podcast-icon-btn w-12 h-12 rounded-2xl bg-black/40 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-white/30 transition" onclick="window.handleDl(event, '${ep.id}')">
+                        <button class="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-white/20 transition" onclick="window.handleDl(event, '${ep.id}')">
                             <img src="${ep.allowDownload ? ICONS.dl : ICONS.noDl}" class="w-6 h-6 icon-white">
                         </button>
-                        <button class="podcast-icon-btn w-12 h-12 rounded-2xl bg-black/40 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-white/30 transition" onclick="window.shareContent('${ep.title}', '${ep.detailUrl}')">
+                        <button class="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-white/20 transition" onclick="window.shareContent('${ep.title}', '${ep.detailUrl}')">
                             <img src="${ICONS.share}" class="w-6 h-6 icon-white">
                         </button>
                     </div>
-                    <button class="podcast-last-episode-btn bg-[#7b2eda] hover:bg-[#8f3ef0] rounded-[40px] px-8 py-2 flex items-center gap-4 transition transform hover:scale-105" onclick="window.handlePlay(event, '${ep.id}')">
-                        <span class="w-12 h-12 rounded-full bg-white/30 flex items-center justify-center">
-                            <img src="${ICONS.play}" class="w-6 h-6 icon-white ml-1">
-                        </span>
-                        <span class="text-left">
-                            <span class="text-xs text-white/90 block">REPRODUCIR</span>
-                            <span class="text-lg font-bold block">${ep.title.substring(0, 20)}...</span>
-                        </span>
-                    </button>
+                </div>
+
+                <!-- Versión escritorio (layout horizontal tipo homeshow) -->
+                <div class="hidden lg:block relative rounded-3xl overflow-hidden bg-gradient-to-br from-zinc-900 to-black border border-white/10">
+                    <div class="absolute inset-0 opacity-20">
+                        <img src="${ep.coverUrl}" class="w-full h-full object-cover blur-3xl scale-110">
+                    </div>
+                    <div class="relative z-10 p-8 flex gap-8">
+                        <img src="${ep.coverUrl}" class="w-48 h-48 rounded-3xl object-cover shadow-2xl border-2 border-white/20" alt="${ep.title}">
+                        <div class="flex-1">
+                            <h1 class="text-4xl font-extrabold text-white mb-2">${ep.title}</h1>
+                            <p class="text-xl text-gray-300 mb-4">${ep.author}</p>
+                            <p class="text-gray-400 max-w-3xl leading-relaxed">${ep.description}</p>
+                            
+                            <div class="flex items-center gap-4 mt-8">
+                                <button class="bg-[#7b2eda] hover:bg-[#8f3ef0] rounded-2xl py-4 px-8 flex items-center gap-3 transition transform hover:scale-105" onclick="window.handlePlay(event, '${ep.id}')">
+                                    <img src="${ICONS.play}" class="w-6 h-6 icon-white">
+                                    <span class="font-bold text-lg">Reproducir</span>
+                                </button>
+                                <button class="w-14 h-14 rounded-2xl bg-black/40 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-white/20 transition" onclick="window.handleAdd(event, '${ep.id}')" title="Añadir a lista">
+                                    <img src="${addIcon}" class="w-6 h-6 icon-white">
+                                </button>
+                                <button class="w-14 h-14 rounded-2xl bg-black/40 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-white/20 transition" onclick="window.handleDl(event, '${ep.id}')" title="${ep.allowDownload ? 'Descargar' : 'Descarga no disponible'}">
+                                    <img src="${ep.allowDownload ? ICONS.dl : ICONS.noDl}" class="w-6 h-6 icon-white">
+                                </button>
+                                <button class="w-14 h-14 rounded-2xl bg-black/40 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-white/20 transition" onclick="window.shareContent('${ep.title}', '${ep.detailUrl}')" title="Compartir">
+                                    <img src="${ICONS.share}" class="w-6 h-6 icon-white">
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             ${ep.series ? `
-            <div class="part-of-program mt-8 p-8 bg-white/5 backdrop-blur rounded-3xl border border-white/10 max-w-5xl mx-auto">
-                <h3 class="text-2xl font-bold mb-6">Parte del programa</h3>
-                <div class="program-card flex items-center gap-8 cursor-pointer" onclick="window.goToDetail('${ep.series.url_serie}')">
-                    <img src="${ep.series.portada_serie}" class="w-24 h-24 rounded-2xl object-cover">
+            <div class="part-of-program mt-8 lg:mt-12 p-6 lg:p-8 bg-white/5 backdrop-blur rounded-3xl border border-white/10">
+                <h3 class="text-xl lg:text-2xl font-bold mb-6">Parte del programa</h3>
+                <div class="program-card flex flex-col sm:flex-row items-start sm:items-center gap-6 cursor-pointer group" onclick="window.goToDetail('${ep.series.url_serie}')">
+                    <img src="${ep.series.portada_serie}" class="w-24 h-24 rounded-2xl object-cover shadow-lg group-hover:scale-105 transition-transform" alt="${ep.series.titulo_serie}">
                     <div>
-                        <h3 class="text-2xl font-bold">${ep.series.titulo_serie}</h3>
-                        <p class="text-gray-400 mt-1">${ep.series.descripcion_serie}</p>
-                        <p class="text-[#7b2eda] font-semibold mt-2">Ver más episodios →</p>
+                        <h3 class="text-xl lg:text-2xl font-bold group-hover:text-blue-400 transition-colors">${ep.series.titulo_serie}</h3>
+                        <p class="text-gray-400 mt-1 line-clamp-2">${ep.series.descripcion_serie}</p>
+                        <p class="text-[#7b2eda] font-semibold mt-3 flex items-center gap-1">
+                            Ver más episodios <span class="text-lg">→</span>
+                        </p>
                     </div>
                 </div>
             </div>
@@ -356,30 +381,32 @@ export function renderSerie(container, serieUrl) {
         const inPlaylist = userStorage.playlist.has(ep.id);
         const addIcon = inPlaylist ? ICONS.added : ICONS.add;
         return `
-            <div class="episode-card flex items-center gap-6 p-6 bg-white/5 backdrop-blur rounded-3xl border border-white/10 mb-4" data-episodio-id="${ep.id}">
-                <img src="${ep.coverUrl}" class="w-24 h-24 rounded-2xl object-cover" loading="lazy">
-                <div class="flex-1 min-w-0">
-                    <h3 class="text-xl font-bold truncate">${ep.title}</h3>
-                    <div class="flex items-center gap-2 mt-1">
-                        <span class="text-gray-400">${ep.author}</span>
-                        <span class="bg-[#7b2eda]/30 px-2 py-0.5 rounded-full text-xs">${ep.type === 'video' ? 'VIDEO' : 'PODCAST'}</span>
+            <div class="episode-card flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 p-4 sm:p-6 bg-white/5 backdrop-blur rounded-2xl sm:rounded-3xl border border-white/10 mb-4 hover:bg-white/10 transition-all group" data-episodio-id="${ep.id}">
+                <img src="${ep.coverUrl}" class="w-full sm:w-24 h-48 sm:h-24 rounded-xl sm:rounded-2xl object-cover" loading="lazy" onclick="window.goToDetail('${ep.detailUrl}')" style="cursor: pointer;">
+                <div class="flex-1 min-w-0 w-full">
+                    <div onclick="window.goToDetail('${ep.detailUrl}')" class="cursor-pointer">
+                        <h3 class="text-lg sm:text-xl font-bold truncate hover:text-blue-400 transition-colors">${ep.title}</h3>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-gray-400 text-sm">${ep.author}</span>
+                            <span class="bg-[#7b2eda]/30 px-2 py-0.5 rounded-full text-[10px] font-bold border border-[#7b2eda]/30">${ep.type === 'video' ? 'VIDEO' : 'PODCAST'}</span>
+                        </div>
                     </div>
-                    <p class="text-gray-400 text-sm mt-2 line-clamp-2">${ep.description}</p>
-                    <div class="flex items-center gap-3 mt-4">
-                        <button class="episode-action-btn w-10 h-10 rounded-xl bg-black/30 backdrop-blur border border-white/10 flex items-center justify-center hover:bg-white/20" onclick="window.handleAdd(event, '${ep.id}')">
+                    <p class="text-gray-400 text-sm mt-2 line-clamp-2 hidden sm:block">${ep.description}</p>
+                    <div class="flex items-center gap-2 mt-4">
+                        <button class="episode-action-btn w-10 h-10 rounded-xl bg-black/30 backdrop-blur border border-white/10 flex items-center justify-center hover:bg-white/20 transition" onclick="window.handleAdd(event, '${ep.id}')" title="Añadir a lista">
                             <img src="${addIcon}" class="w-5 h-5 icon-white">
                         </button>
-                        <button class="episode-action-btn w-10 h-10 rounded-xl bg-black/30 backdrop-blur border border-white/10 flex items-center justify-center hover:bg-white/20" onclick="window.handleDl(event, '${ep.id}')">
+                        <button class="episode-action-btn w-10 h-10 rounded-xl bg-black/30 backdrop-blur border border-white/10 flex items-center justify-center hover:bg-white/20 transition" onclick="window.handleDl(event, '${ep.id}')" title="${ep.allowDownload ? 'Descargar' : 'Descarga no disponible'}">
                             <img src="${ep.allowDownload ? ICONS.dl : ICONS.noDl}" class="w-5 h-5 icon-white">
                         </button>
-                        <button class="episode-action-btn w-10 h-10 rounded-xl bg-black/30 backdrop-blur border border-white/10 flex items-center justify-center hover:bg-white/20" onclick="window.shareContent('${ep.title}', '${ep.detailUrl}')">
+                        <button class="episode-action-btn w-10 h-10 rounded-xl bg-black/30 backdrop-blur border border-white/10 flex items-center justify-center hover:bg-white/20 transition" onclick="window.shareContent('${ep.title}', '${ep.detailUrl}')" title="Compartir">
                             <img src="${ICONS.share}" class="w-5 h-5 icon-white">
+                        </button>
+                        <button class="episode-play-btn w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-[#7b2eda] flex items-center justify-center hover:scale-110 transition ml-auto" onclick="window.handlePlay(event, '${ep.id}')" title="Reproducir">
+                            <img src="${ICONS.play}" class="w-5 h-5 sm:w-7 sm:h-7 icon-white ml-1">
                         </button>
                     </div>
                 </div>
-                <button class="episode-play-btn w-14 h-14 rounded-full bg-[#7b2eda] flex items-center justify-center hover:scale-110 transition" onclick="window.handlePlay(event, '${ep.id}')">
-                    <img src="${ICONS.play}" class="w-7 h-7 icon-white ml-1">
-                </button>
             </div>
         `;
     }).join('');
@@ -387,51 +414,69 @@ export function renderSerie(container, serieUrl) {
     const ultimoEpisodio = episodiosSerie[0] || null;
 
     const html = `
-        <div class="detail-full-width">
-            <div class="podcast-header relative rounded-none overflow-hidden mb-8 w-full">
-                <div class="podcast-header-bg absolute inset-0 bg-cover bg-center filter blur-2xl brightness-70 scale-110" style="background-image: url('${serie.portada_serie}');"></div>
-                <div class="relative z-10 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-8 min-h-[300px] flex items-end">
-                    <div class="flex items-end gap-8 max-w-[1600px] mx-auto w-full px-4">
-                        <img src="${serie.portada_serie}" class="w-40 h-40 rounded-[32px] object-cover shadow-2xl" alt="cover serie">
-                        <div>
-                            <h1 class="text-4xl font-extrabold">${serie.titulo_serie}</h1>
-                            <p class="text-lg text-gray-300 mt-2">${episodiosSerie[0]?.author || ''}</p>
-                            <p class="text-gray-400 mt-3 max-w-2xl">${serie.descripcion_serie}</p>
-                        </div>
+        <div class="detail-view w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <!-- Header adaptable: mobile vs desktop -->
+            <div class="serie-header mb-8">
+                <!-- Versión móvil (stack vertical) -->
+                <div class="block lg:hidden">
+                    <div class="relative w-full aspect-square max-w-[300px] mx-auto mb-6 rounded-3xl overflow-hidden shadow-2xl">
+                        <img src="${serie.portada_serie}" class="w-full h-full object-cover" alt="${serie.titulo_serie}">
                     </div>
-                </div>
-                <div class="relative z-10 flex justify-between items-center px-8 pb-8 max-w-[1600px] mx-auto w-full">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-2xl overflow-hidden bg-white/10">
-                            <img src="${serie.portada_serie}" class="w-full h-full object-cover">
-                        </div>
-                        <button class="podcast-icon-btn w-12 h-12 rounded-2xl bg-black/40 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-white/30 transition">
-                            <img src="${ICONS.add}" class="w-6 h-6 icon-white">
+                    <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2">${serie.titulo_serie}</h1>
+                    <p class="text-lg text-gray-300 mb-3">${episodiosSerie[0]?.author || ''}</p>
+                    <p class="text-gray-400 mb-6 leading-relaxed">${serie.descripcion_serie}</p>
+                    
+                    <!-- Barra de acciones móvil -->
+                    <div class="flex items-center gap-3 mb-8">
+                        ${ultimoEpisodio ? `
+                        <button class="flex-1 bg-[#7b2eda] hover:bg-[#8f3ef0] rounded-2xl py-4 px-6 flex items-center justify-center gap-3 transition transform hover:scale-[1.02]" onclick="window.handlePlay(event, '${ultimoEpisodio.id}')">
+                            <img src="${ICONS.play}" class="w-6 h-6 icon-white">
+                            <span class="font-bold">Último episodio</span>
                         </button>
-                        <button class="podcast-icon-btn w-12 h-12 rounded-2xl bg-black/40 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-white/30 transition">
-                            <img src="${ICONS.dl}" class="w-6 h-6 icon-white">
-                        </button>
-                        <button class="podcast-icon-btn w-12 h-12 rounded-2xl bg-black/40 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-white/30 transition" onclick="window.shareContent('${serie.titulo_serie}', '${serie.url_serie}')">
+                        ` : ''}
+                        <button class="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-white/20 transition" onclick="window.shareContent('${serie.titulo_serie}', '${serie.url_serie}')" title="Compartir serie">
                             <img src="${ICONS.share}" class="w-6 h-6 icon-white">
                         </button>
                     </div>
-                    ${ultimoEpisodio ? `
-                    <button class="podcast-last-episode-btn bg-[#7b2eda] hover:bg-[#8f3ef0] rounded-[40px] px-8 py-2 flex items-center gap-4 transition transform hover:scale-105" onclick="window.handlePlay(event, '${ultimoEpisodio.id}')">
-                        <span class="w-12 h-12 rounded-full bg-white/30 flex items-center justify-center">
-                            <img src="${ICONS.play}" class="w-6 h-6 icon-white ml-1">
-                        </span>
-                        <span class="text-left">
-                            <span class="text-xs text-white/90 block">ÚLTIMO EPISODIO</span>
-                            <span class="text-lg font-bold block">${ultimoEpisodio.title.substring(0, 20)}...</span>
-                        </span>
-                    </button>
-                    ` : ''}
+                </div>
+
+                <!-- Versión escritorio (layout horizontal tipo homeshow) -->
+                <div class="hidden lg:block relative rounded-3xl overflow-hidden bg-gradient-to-br from-zinc-900 to-black border border-white/10">
+                    <div class="absolute inset-0 opacity-20">
+                        <img src="${serie.portada_serie}" class="w-full h-full object-cover blur-3xl scale-110">
+                    </div>
+                    <div class="relative z-10 p-8 flex gap-8">
+                        <img src="${serie.portada_serie}" class="w-48 h-48 rounded-3xl object-cover shadow-2xl border-2 border-white/20" alt="${serie.titulo_serie}">
+                        <div class="flex-1">
+                            <h1 class="text-4xl font-extrabold text-white mb-2">${serie.titulo_serie}</h1>
+                            <p class="text-xl text-gray-300 mb-4">${episodiosSerie[0]?.author || ''}</p>
+                            <p class="text-gray-400 max-w-3xl leading-relaxed">${serie.descripcion_serie}</p>
+                            
+                            <div class="flex items-center gap-4 mt-8">
+                                ${ultimoEpisodio ? `
+                                <button class="bg-[#7b2eda] hover:bg-[#8f3ef0] rounded-2xl py-4 px-8 flex items-center gap-3 transition transform hover:scale-105" onclick="window.handlePlay(event, '${ultimoEpisodio.id}')">
+                                    <img src="${ICONS.play}" class="w-6 h-6 icon-white">
+                                    <span class="font-bold text-lg">Último episodio</span>
+                                </button>
+                                ` : ''}
+                                <button class="w-14 h-14 rounded-2xl bg-black/40 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-white/20 transition" onclick="window.shareContent('${serie.titulo_serie}', '${serie.url_serie}')" title="Compartir serie">
+                                    <img src="${ICONS.share}" class="w-6 h-6 icon-white">
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Lista de episodios (95% de ancho) -->
-            <div class="podcast-episodes-list mt-8 max-w-5xl mx-auto w-[95%]">
-                ${episodiosHtml}
+            <!-- Lista de episodios profesionalizada -->
+            <div class="episodes-list mt-8 lg:mt-12">
+                <h2 class="text-xl lg:text-2xl font-bold mb-6 flex items-center gap-2">
+                    <span>Episodios</span>
+                    <span class="text-sm font-normal text-gray-500">(${episodiosSerie.length})</span>
+                </h2>
+                <div class="space-y-4">
+                    ${episodiosHtml}
+                </div>
             </div>
         </div>
     `;
