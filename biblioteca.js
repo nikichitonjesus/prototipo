@@ -7,7 +7,6 @@ export function render(container) {
     const likedIds = userStorage.liked.get();
     const completedIds = userStorage.completed.get();
 
-    // Obtener episodios completos a partir de IDs
     const likedEpisodios = episodios.filter(ep => likedIds.includes(ep.id));
     const completedEpisodios = episodios.filter(ep => completedIds.includes(ep.id));
 
@@ -26,7 +25,7 @@ export function render(container) {
         playlist.forEach(ep => {
             html += `
                 <div class="bg-white/5 rounded-xl p-4 cursor-pointer hover:bg-white/10 transition" onclick="window.goToDetail('${ep.detailUrl}')">
-                    <img src="${ep.coverUrl}" class="w-full aspect-square object-cover rounded-lg mb-3">
+                    <img src="${ep.coverUrl}" class="w-full aspect-square object-cover rounded-lg mb-3" loading="lazy">
                     <h3 class="font-bold text-white truncate">${ep.title}</h3>
                     <p class="text-sm text-gray-400 truncate">${ep.author}</p>
                 </div>
@@ -49,7 +48,7 @@ export function render(container) {
         likedEpisodios.forEach(ep => {
             html += `
                 <div class="bg-white/5 rounded-xl p-4 cursor-pointer hover:bg-white/10 transition" onclick="window.goToDetail('${ep.detailUrl}')">
-                    <img src="${ep.coverUrl}" class="w-full aspect-square object-cover rounded-lg mb-3">
+                    <img src="${ep.coverUrl}" class="w-full aspect-square object-cover rounded-lg mb-3" loading="lazy">
                     <h3 class="font-bold text-white truncate">${ep.title}</h3>
                     <p class="text-sm text-gray-400 truncate">${ep.author}</p>
                 </div>
@@ -72,7 +71,7 @@ export function render(container) {
         completedEpisodios.forEach(ep => {
             html += `
                 <div class="bg-white/5 rounded-xl p-4 cursor-pointer hover:bg-white/10 transition" onclick="window.goToDetail('${ep.detailUrl}')">
-                    <img src="${ep.coverUrl}" class="w-full aspect-square object-cover rounded-lg mb-3">
+                    <img src="${ep.coverUrl}" class="w-full aspect-square object-cover rounded-lg mb-3" loading="lazy">
                     <h3 class="font-bold text-white truncate">${ep.title}</h3>
                     <p class="text-sm text-gray-400 truncate">${ep.author}</p>
                 </div>
@@ -89,5 +88,4 @@ export function render(container) {
     container.innerHTML = html;
 }
 
-// Esta página no necesita ocultar el header
 export const header = true;
