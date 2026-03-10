@@ -1,4 +1,7 @@
 // buscar.js
+import { getAllEpisodios } from './episodios.js';
+import { createGridCard } from './show.js'; // reutilizamos función de tarjeta
+
 export function render(container) {
     container.innerHTML = `
         <div class="max-w-5xl mx-auto py-8">
@@ -19,28 +22,20 @@ export function render(container) {
         const query = input.value.trim();
         if (!query) return;
 
-        // Importar episodios y filtrar (simulado)
-        import('./episodios.js').then(({ episodios }) => {
-            const term = query.toLowerCase();
-            const filtered = episodios.filter(ep =>
-                ep.title.toLowerCase().includes(term) ||
-                ep.author.toLowerCase().includes(term) ||
-                ep.description.toLowerCase().includes(term)
-            );
+        const term = query.toLowerCase();
+        const episodios = getAllEpisodios();
+        const filtered = episodios.filter(ep =>
+            ep.title.toLowerCase().includes(term) ||
+            ep.author.toLowerCase().includes(term) ||
+            ep.description.toLowerCase().includes(term)
+        );
 
-            if (filtered.length === 0) {
-                resultsDiv.innerHTML = '<p class="text-gray-400 col-span-full">No se encontraron resultados.</p>';
-                return;
-            }
+        if (filtered.length === 0) {
+            resultsDiv.innerHTML = '<p class="text-gray-400 col-span-full">No se encontraron resultados.</p>';
+            return;
+        }
 
-            resultsDiv.innerHTML = filtered.map(ep => `
-                <div class="bg-white/5 rounded-xl p-4 cursor-pointer hover:bg-white/10 transition" onclick="window.goToDetail('${ep.detailUrl}')">
-                    <img src="${ep.coverUrl}" class="w-full aspect-square object-cover rounded-lg mb-3">
-                    <h3 class="font-bold text-white truncate">${ep.title}</h3>
-                    <p class="text-sm text-gray-400 truncate">${ep.author}</p>
-                </div>
-            `).join('');
-        });
+        resultsDiv.innerHTML = filtered.map(ep => createGridCard(ep)).join('');
     }
 
     btn.addEventListener('click', performSearch);
