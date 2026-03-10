@@ -1,6 +1,5 @@
 // player.js - Reproductor universal flotante
 
-// Crear el reproductor flotante si no existe
 function createPlayer() {
     if (document.getElementById('floating-player')) return;
 
@@ -30,7 +29,6 @@ function createPlayer() {
     `;
     document.body.insertAdjacentHTML('beforeend', playerHTML);
 
-    // Variables de estado
     let currentMedia = null;
     let isPlaying = false;
 
@@ -46,12 +44,11 @@ function createPlayer() {
     const titleEl = document.getElementById('player-title');
     const authorEl = document.getElementById('player-author');
 
-    // Alternar play/pause
     function togglePlay() {
         if (currentMedia) {
             if (currentMedia.paused) {
                 currentMedia.play();
-                playIcon.src = 'https://marca1.odoo.com/web/image/508-f876320c/pause.svg'; // asumiendo que existe pause.svg
+                playIcon.src = 'https://marca1.odoo.com/web/image/508-f876320c/pause.svg';
             } else {
                 currentMedia.pause();
                 playIcon.src = 'https://marca1.odoo.com/web/image/508-f876320c/play.svg';
@@ -59,7 +56,6 @@ function createPlayer() {
         }
     }
 
-    // Actualizar progreso
     function updateProgress() {
         if (currentMedia && currentMedia.duration) {
             const percent = (currentMedia.currentTime / currentMedia.duration) * 100;
@@ -67,7 +63,6 @@ function createPlayer() {
         }
     }
 
-    // Saltar al hacer clic en la barra
     function seek(e) {
         if (currentMedia && currentMedia.duration) {
             const rect = progressBar.getBoundingClientRect();
@@ -77,7 +72,6 @@ function createPlayer() {
         }
     }
 
-    // Cerrar reproductor
     function closePlayer() {
         if (currentMedia) {
             currentMedia.pause();
@@ -87,30 +81,21 @@ function createPlayer() {
         player.dataset.mediaUrl = '';
     }
 
-    // Event listeners
     playPauseBtn.addEventListener('click', togglePlay);
     progressBar.addEventListener('click', seek);
     closeBtn.addEventListener('click', closePlayer);
 
-    if (audioEl) {
-        audioEl.addEventListener('timeupdate', updateProgress);
-        audioEl.addEventListener('ended', () => {
-            playIcon.src = 'https://marca1.odoo.com/web/image/508-f876320c/play.svg';
-        });
-    }
-    if (videoEl) {
-        videoEl.addEventListener('timeupdate', updateProgress);
-        videoEl.addEventListener('ended', () => {
-            playIcon.src = 'https://marca1.odoo.com/web/image/508-f876320c/play.svg';
-        });
-    }
+    audioEl.addEventListener('timeupdate', updateProgress);
+    audioEl.addEventListener('ended', () => {
+        playIcon.src = 'https://marca1.odoo.com/web/image/508-f876320c/play.svg';
+    });
+    videoEl.addEventListener('timeupdate', updateProgress);
+    videoEl.addEventListener('ended', () => {
+        playIcon.src = 'https://marca1.odoo.com/web/image/508-f876320c/play.svg';
+    });
 
-    // Función global para reproducir
     window.playEpisodeExpanded = function(mediaUrl, mediaType, coverUrlContainer, coverUrlInfo, title, detailUrl, author, next, text, allowDownload) {
-        // Usar coverUrlContainer si existe, sino coverUrlInfo
         const cover = coverUrlContainer || coverUrlInfo || '';
-
-        // Configurar UI
         coverImg.src = cover;
         titleEl.textContent = title;
         authorEl.textContent = author;
@@ -118,13 +103,11 @@ function createPlayer() {
         player.dataset.detailUrl = detailUrl;
         player.dataset.allowDownload = allowDownload;
 
-        // Detener reproducción anterior
         if (currentMedia) {
             currentMedia.pause();
             currentMedia.currentTime = 0;
         }
 
-        // Elegir elemento según tipo
         if (mediaType === 'video') {
             videoEl.style.display = 'block';
             audioEl.style.display = 'none';
@@ -137,14 +120,12 @@ function createPlayer() {
             currentMedia = audioEl;
         }
 
-        // Reproducir
         currentMedia.play().catch(e => console.warn('Auto-play bloqueado:', e));
         playIcon.src = 'https://marca1.odoo.com/web/image/508-f876320c/pause.svg';
         player.classList.add('active');
     };
 }
 
-// Inicializar cuando el DOM esté listo
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', createPlayer);
 } else {
