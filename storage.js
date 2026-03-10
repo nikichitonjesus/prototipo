@@ -1,4 +1,4 @@
-// storage.js - Gestión de lista de usuario (playlist)
+// storage.js - Gestión de lista de usuario (playlist, likes, completados)
 
 const PLAYLIST_KEY = 'balta_playlist';
 const LIKED_KEY = 'balta_liked';
@@ -79,7 +79,7 @@ export function isCompleted(episodioId) {
     return getCompleted().includes(episodioId);
 }
 
-// Función universal para cualquier módulo
+// Objeto unificado
 export const userStorage = {
     playlist: { get: getPlaylist, add: addToPlaylist, remove: removeFromPlaylist, has: isInPlaylist },
     liked: { get: getLiked, toggle: toggleLiked, has: isLiked },
