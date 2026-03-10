@@ -1,4 +1,4 @@
-// show.js - Vistas del feed, episodio, serie, categorías, etc.
+// show.js - Vistas del feed, episodio, serie, etc.
 
 import { getAllEpisodios, getSerieById, getEpisodiosBySerieId, getEpisodiosConSerie } from './episodios.js';
 import { userStorage } from './storage.js';
@@ -74,8 +74,8 @@ export const DATA = getEpisodiosConSerie().map(ep => ({
     categories: determineCategories(ep)
 }));
 
-// ---------- RENDERIZADO DE TARJETAS ----------
-function createStandardCard(ep) {
+// ---------- RENDERIZADO DE TARJETAS (exportadas para otros módulos) ----------
+export function createStandardCard(ep) {
     const inPlaylist = userStorage.playlist.has(ep.id);
     const addIcon = inPlaylist ? ICONS.added : ICONS.add;
     const dlIcon = ep.allowDownload ? ICONS.dl : ICONS.noDl;
@@ -99,7 +99,7 @@ function createStandardCard(ep) {
     </div>`;
 }
 
-function createVideoExpand(ep) {
+export function createVideoExpand(ep) {
     const inPlaylist = userStorage.playlist.has(ep.id);
     const addIcon = inPlaylist ? ICONS.added : ICONS.add;
     const dlIcon = ep.allowDownload ? ICONS.dl : ICONS.noDl;
@@ -120,7 +120,7 @@ function createVideoExpand(ep) {
     </div>`;
 }
 
-function createListItem(ep, idx) {
+export function createListItem(ep, idx) {
     const inPlaylist = userStorage.playlist.has(ep.id);
     const addIcon = inPlaylist ? ICONS.added : ICONS.add;
 
@@ -145,7 +145,7 @@ function createListItem(ep, idx) {
     </div>`;
 }
 
-function createGridCard(item) {
+export function createGridCard(item) {
     const inPlaylist = userStorage.playlist.has(item.id);
     const addIcon = inPlaylist ? ICONS.added : ICONS.add;
     const dlIcon = item.allowDownload ? ICONS.dl : ICONS.noDl;
@@ -171,7 +171,7 @@ function createGridCard(item) {
     `;
 }
 
-// ---------- CARRUSELES ----------
+// ---------- CARRUSELES (no se exportan, solo uso interno) ----------
 function createCarousel(title, type, items, categoryContext) {
     if (!items || items.length === 0) return '';
 
@@ -206,7 +206,7 @@ function createCarousel(title, type, items, categoryContext) {
     return `<section class="carousel-wrapper relative group/section mb-8 sm:mb-12">
         <div class="flex items-end justify-between mb-3 sm:mb-5 px-1">
             <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-white hover:text-blue-500 transition-colors">${title}</h2>
-            <button onclick="window.filterByCategory('${categoryContext}')" class="text-xs font-bold text-gray-500 uppercase tracking-wider hover:text-white">Ver todo</button>
+            <button onclick="window.location.href='/categoria/${encodeURIComponent(categoryContext)}'" class="text-xs font-bold text-gray-500 uppercase tracking-wider hover:text-white">Ver todo</button>
         </div>
         <div class="relative">
             <div class="nav-btn left" onclick="document.getElementById('${id}').scrollLeft -= 600"><button>❮</button></div>
@@ -271,7 +271,7 @@ function createSeriesCarousel() {
     </section>`;
 }
 
-// ---------- VISTAS DE DETALLE ----------
+// ---------- VISTAS DE DETALLE (con correcciones de ancho e iconos) ----------
 export function renderEpisodio(container, episodioId) {
     const ep = DATA.find(e => e.id === episodioId);
     if (!ep) {
@@ -283,11 +283,11 @@ export function renderEpisodio(container, episodioId) {
     const addIcon = inPlaylist ? ICONS.added : ICONS.add;
 
     const html = `
-        <div class="podcast-widget max-w-5xl mx-auto">
-            <div class="podcast-header relative rounded-[40px] overflow-hidden mb-8">
+        <div class="detail-full-width">
+            <div class="podcast-header relative rounded-none overflow-hidden mb-8 w-full">
                 <div class="podcast-header-bg absolute inset-0 bg-cover bg-center filter blur-2xl brightness-70 scale-110" style="background-image: url('${ep.coverUrl}');"></div>
                 <div class="relative z-10 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-8 min-h-[300px] flex items-end">
-                    <div class="flex items-end gap-8">
+                    <div class="flex items-end gap-8 max-w-[1600px] mx-auto w-full px-4">
                         <img src="${ep.coverUrl}" class="w-40 h-40 rounded-[32px] object-cover shadow-2xl" alt="cover">
                         <div>
                             <h1 class="text-4xl font-extrabold">${ep.title}</h1>
@@ -296,24 +296,24 @@ export function renderEpisodio(container, episodioId) {
                         </div>
                     </div>
                 </div>
-                <div class="relative z-10 flex justify-between items-center px-8 pb-8">
+                <div class="relative z-10 flex justify-between items-center px-8 pb-8 max-w-[1600px] mx-auto w-full">
                     <div class="flex items-center gap-4">
                         <div class="w-12 h-12 rounded-2xl overflow-hidden bg-white/10">
                             <img src="${ep.coverUrl}" class="w-full h-full object-cover">
                         </div>
                         <button class="podcast-icon-btn w-12 h-12 rounded-2xl bg-black/40 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-white/30 transition" onclick="window.handleAdd(event, '${ep.id}')">
-                            <img src="${addIcon}" class="w-6 h-6 filter invert">
+                            <img src="${addIcon}" class="w-6 h-6 icon-white">
                         </button>
                         <button class="podcast-icon-btn w-12 h-12 rounded-2xl bg-black/40 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-white/30 transition" onclick="window.handleDl(event, '${ep.id}')">
-                            <img src="${ep.allowDownload ? ICONS.dl : ICONS.noDl}" class="w-6 h-6 filter invert">
+                            <img src="${ep.allowDownload ? ICONS.dl : ICONS.noDl}" class="w-6 h-6 icon-white">
                         </button>
                         <button class="podcast-icon-btn w-12 h-12 rounded-2xl bg-black/40 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-white/30 transition" onclick="window.shareContent('${ep.title}', '${ep.detailUrl}')">
-                            <img src="${ICONS.share}" class="w-6 h-6 filter invert">
+                            <img src="${ICONS.share}" class="w-6 h-6 icon-white">
                         </button>
                     </div>
                     <button class="podcast-last-episode-btn bg-[#7b2eda] hover:bg-[#8f3ef0] rounded-[40px] px-8 py-2 flex items-center gap-4 transition transform hover:scale-105" onclick="window.handlePlay(event, '${ep.id}')">
                         <span class="w-12 h-12 rounded-full bg-white/30 flex items-center justify-center">
-                            <img src="${ICONS.play}" class="w-6 h-6 filter invert ml-1">
+                            <img src="${ICONS.play}" class="w-6 h-6 icon-white ml-1">
                         </span>
                         <span class="text-left">
                             <span class="text-xs text-white/90 block">REPRODUCIR</span>
@@ -324,7 +324,7 @@ export function renderEpisodio(container, episodioId) {
             </div>
 
             ${ep.series ? `
-            <div class="part-of-program mt-8 p-8 bg-white/5 backdrop-blur rounded-3xl border border-white/10">
+            <div class="part-of-program mt-8 p-8 bg-white/5 backdrop-blur rounded-3xl border border-white/10 max-w-5xl mx-auto">
                 <h3 class="text-2xl font-bold mb-6">Parte del programa</h3>
                 <div class="program-card flex items-center gap-8 cursor-pointer" onclick="window.goToDetail('${ep.series.url_serie}')">
                     <img src="${ep.series.portada_serie}" class="w-24 h-24 rounded-2xl object-cover">
@@ -367,18 +367,18 @@ export function renderSerie(container, serieUrl) {
                     <p class="text-gray-400 text-sm mt-2 line-clamp-2">${ep.description}</p>
                     <div class="flex items-center gap-3 mt-4">
                         <button class="episode-action-btn w-10 h-10 rounded-xl bg-black/30 backdrop-blur border border-white/10 flex items-center justify-center hover:bg-white/20" onclick="window.handleAdd(event, '${ep.id}')">
-                            <img src="${addIcon}" class="w-5 h-5 filter invert">
+                            <img src="${addIcon}" class="w-5 h-5 icon-white">
                         </button>
                         <button class="episode-action-btn w-10 h-10 rounded-xl bg-black/30 backdrop-blur border border-white/10 flex items-center justify-center hover:bg-white/20" onclick="window.handleDl(event, '${ep.id}')">
-                            <img src="${ep.allowDownload ? ICONS.dl : ICONS.noDl}" class="w-5 h-5 filter invert">
+                            <img src="${ep.allowDownload ? ICONS.dl : ICONS.noDl}" class="w-5 h-5 icon-white">
                         </button>
                         <button class="episode-action-btn w-10 h-10 rounded-xl bg-black/30 backdrop-blur border border-white/10 flex items-center justify-center hover:bg-white/20" onclick="window.shareContent('${ep.title}', '${ep.detailUrl}')">
-                            <img src="${ICONS.share}" class="w-5 h-5 filter invert">
+                            <img src="${ICONS.share}" class="w-5 h-5 icon-white">
                         </button>
                     </div>
                 </div>
                 <button class="episode-play-btn w-14 h-14 rounded-full bg-[#7b2eda] flex items-center justify-center hover:scale-110 transition" onclick="window.handlePlay(event, '${ep.id}')">
-                    <img src="${ICONS.play}" class="w-7 h-7 filter invert ml-1">
+                    <img src="${ICONS.play}" class="w-7 h-7 icon-white ml-1">
                 </button>
             </div>
         `;
@@ -387,11 +387,11 @@ export function renderSerie(container, serieUrl) {
     const ultimoEpisodio = episodiosSerie[0] || null;
 
     const html = `
-        <div class="podcast-widget max-w-5xl mx-auto">
-            <div class="podcast-header relative rounded-[40px] overflow-hidden mb-8">
+        <div class="detail-full-width">
+            <div class="podcast-header relative rounded-none overflow-hidden mb-8 w-full">
                 <div class="podcast-header-bg absolute inset-0 bg-cover bg-center filter blur-2xl brightness-70 scale-110" style="background-image: url('${serie.portada_serie}');"></div>
                 <div class="relative z-10 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-8 min-h-[300px] flex items-end">
-                    <div class="flex items-end gap-8">
+                    <div class="flex items-end gap-8 max-w-[1600px] mx-auto w-full px-4">
                         <img src="${serie.portada_serie}" class="w-40 h-40 rounded-[32px] object-cover shadow-2xl" alt="cover serie">
                         <div>
                             <h1 class="text-4xl font-extrabold">${serie.titulo_serie}</h1>
@@ -400,25 +400,25 @@ export function renderSerie(container, serieUrl) {
                         </div>
                     </div>
                 </div>
-                <div class="relative z-10 flex justify-between items-center px-8 pb-8">
+                <div class="relative z-10 flex justify-between items-center px-8 pb-8 max-w-[1600px] mx-auto w-full">
                     <div class="flex items-center gap-4">
                         <div class="w-12 h-12 rounded-2xl overflow-hidden bg-white/10">
                             <img src="${serie.portada_serie}" class="w-full h-full object-cover">
                         </div>
                         <button class="podcast-icon-btn w-12 h-12 rounded-2xl bg-black/40 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-white/30 transition">
-                            <img src="${ICONS.add}" class="w-6 h-6 filter invert">
+                            <img src="${ICONS.add}" class="w-6 h-6 icon-white">
                         </button>
                         <button class="podcast-icon-btn w-12 h-12 rounded-2xl bg-black/40 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-white/30 transition">
-                            <img src="${ICONS.dl}" class="w-6 h-6 filter invert">
+                            <img src="${ICONS.dl}" class="w-6 h-6 icon-white">
                         </button>
                         <button class="podcast-icon-btn w-12 h-12 rounded-2xl bg-black/40 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-white/30 transition" onclick="window.shareContent('${serie.titulo_serie}', '${serie.url_serie}')">
-                            <img src="${ICONS.share}" class="w-6 h-6 filter invert">
+                            <img src="${ICONS.share}" class="w-6 h-6 icon-white">
                         </button>
                     </div>
                     ${ultimoEpisodio ? `
                     <button class="podcast-last-episode-btn bg-[#7b2eda] hover:bg-[#8f3ef0] rounded-[40px] px-8 py-2 flex items-center gap-4 transition transform hover:scale-105" onclick="window.handlePlay(event, '${ultimoEpisodio.id}')">
                         <span class="w-12 h-12 rounded-full bg-white/30 flex items-center justify-center">
-                            <img src="${ICONS.play}" class="w-6 h-6 filter invert ml-1">
+                            <img src="${ICONS.play}" class="w-6 h-6 icon-white ml-1">
                         </span>
                         <span class="text-left">
                             <span class="text-xs text-white/90 block">ÚLTIMO EPISODIO</span>
@@ -429,8 +429,8 @@ export function renderSerie(container, serieUrl) {
                 </div>
             </div>
 
-            <!-- Lista de episodios -->
-            <div class="podcast-episodes-list mt-8">
+            <!-- Lista de episodios (95% de ancho) -->
+            <div class="podcast-episodes-list mt-8 max-w-5xl mx-auto w-[95%]">
                 ${episodiosHtml}
             </div>
         </div>
@@ -512,7 +512,7 @@ export function renderFeed(container) {
 export function renderGrid(container, items, title) {
     let gridView = document.getElementById('grid-view');
     if (!gridView) {
-        // Si no existe, lo creamos (esto debería estar en el HTML)
+        // Si no existe, lo creamos
         container.innerHTML = `
             <div id="feed-view" class="hidden"></div>
             <div id="grid-view" class="transition-opacity duration-300">
@@ -584,7 +584,6 @@ window.shareContent = async (title, url) => {
     }
 };
 
-// Funciones de interacción (serán llamadas desde el router)
 window.handlePlay = function(e, episodioId) {
     e.stopPropagation();
     e.preventDefault();
@@ -600,7 +599,7 @@ window.handlePlay = function(e, episodioId) {
             ep.title,
             ep.detailUrl,
             ep.author,
-            [], // lista de reproducción (opcional)
+            [],
             ep.description,
             ep.allowDownload
         );
@@ -661,3 +660,31 @@ window.goToDetail = function(url) {
         window.dispatchEvent(new PopStateEvent('popstate'));
     }
 };
+
+// Renderizar categorías en el header
+export function renderCategoryPills(activeCat = 'Todos') {
+    const container = document.getElementById('category-pills');
+    if (!container) return;
+    container.innerHTML = '';
+    CATEGORIES.forEach(cat => {
+        const isActive = cat === activeCat;
+        const btn = document.createElement('button');
+        btn.className = `whitespace-nowrap px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs font-bold transition-all ${isActive ? 'bg-white text-black' : 'bg-white/10 text-gray-300 hover:bg-white/20'}`;
+        btn.innerText = cat;
+        btn.onclick = () => {
+            if (cat === 'Todos') {
+                window.location.href = '/';
+            } else {
+                window.location.href = `/categoria/${encodeURIComponent(cat)}`;
+            }
+        };
+        container.appendChild(btn);
+    });
+}
+
+// Inicializar categorías al cargar
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => renderCategoryPills());
+} else {
+    renderCategoryPills();
+}
