@@ -1,83 +1,111 @@
 // main.js - Router principal
 
-// Mapa de rutas estáticas
-const routes = [
-    { path: '/', module: () => import('./show.js'), render: 'renderFeed' },
-    { path: '/biblioteca', module: () => import('./biblioteca.js') },
-    { path: '/explorar', module: () => import('./explorar.js') },
-    { path: '/buscar', module: () => import('./buscar.js') }
+import { DATA, renderFeed, renderGrid, renderEpisodio, renderSerie } from './show.js';
+import { getEpisodioByDetailUrl, getSerieByUrl, getEpisodiosBySerieUrl } from './episodios.js';
+import './player.js';
+
+// Páginas especiales
+const PAGES = [
+    { path: '/biblioteca', module: () => import('./biblioteca.js'), header: true },
+    { path: '/explorar', module: () => import('./explorar.js'), header: true },
+    { path: '/buscar', module: () => import('./buscar.js'), header: true }
 ];
 
-// Función para manejar la navegación
+let lastScrollTop = 0;
+
 async function router() {
     const path = window.location.pathname;
+    const searchParams = new URLSearchParams(window.location.search);
     const container = document.getElementById('content');
     const header = document.getElementById('main-header');
+    const categoryFilters = document.getElementById('category-filters');
 
-    // Limpiar clases de ocultar header
-    if (header) header.classList.remove('header-hidden');
+    // Mostrar header por defecto
+    if (header) header.classList.remove('hidden');
+    if (categoryFilters) categoryFilters.classList.remove('hidden');
 
-    // 1. Buscar ruta estática exacta
-    const route = routes.find(r => r.path === path);
-    if (route) {
-        const module = await route.module();
-        if (route.render) {
-            // Si es show.js, llamamos a la función específica (renderFeed)
-            module[route.render](container);
-        } else {
-            module.render(container);
-        }
-        // Controlar visibilidad del header según export 'header'
+    // 1. Ruta raíz
+    if (path === '/') {
+        renderFeed(container);
+        document.title = 'Balta Media · Conocimiento en acción';
+        return;
+    }
+
+    // 2. Páginas especiales
+    const page = PAGES.find(p => p.path === path);
+    if (page) {
+        const module = await page.module();
+        module.render(container);
+        document.title = `${page.path.slice(1)} · Balta Media`;
         if (module.header === false) {
-            header.classList.add('header-hidden');
+            header.classList.add('hidden');
+            categoryFilters.classList.add('hidden');
         }
         return;
     }
 
-    // 2. Manejar rutas dinámicas: /episodio/:id
-    const episodioMatch = path.match(/^\/episodio\/(.+)$/);
-    if (episodioMatch) {
-        const id = episodioMatch[1];
-        const showModule = await import('./show.js');
-        showModule.renderEpisodio(container, id);
-        // Los episodios muestran header por defecto
-        header.classList.remove('header-hidden');
+    // 3. Búsqueda
+    if (path === '/buscar' && searchParams.has('q')) {
+        const query = searchParams.get('q');
+        const term = query.toLowerCase().trim();
+        const results = DATA.filter(ep =>
+            ep.title.toLowerCase().includes(term) ||
+            ep.author.toLowerCase().includes(term) ||
+            ep.categories.some(c => c.toLowerCase().includes(term)) ||
+            ep.description.toLowerCase().includes(term)
+        );
+        renderGrid(container, results, `Resultados para "${query}"`);
+        document.title = `Búsqueda: ${query} · Balta Media`;
         return;
     }
 
-    // 3. Serie: la url de serie puede ser como /teoria-del-proceso (sin prefijo)
-    // También puede ser con prefijo /serie/...
-    const serieMatch = path.match(/^\/serie\/(.+)$/);
-    if (serieMatch) {
-        const serieUrl = '/' + serieMatch[1];
-        const showModule = await import('./show.js');
-        showModule.renderSerie(container, serieUrl);
-        header.classList.remove('header-hidden');
+    // 4. Categoría
+    if (path.startsWith('/categoria/')) {
+        const cat = decodeURIComponent(path.replace('/categoria/', ''));
+        const results = DATA.filter(ep => ep.categories.includes(cat));
+        renderGrid(container, results, cat);
+        document.title = `${cat} · Balta Media`;
         return;
     }
 
-    // 4. Intentar interpretar como serie sin prefijo (p.ej. /ddpp-3/clases)
-    // Importar episodios para ver si existe serie con esa url
-    const { getSerieByUrl } = await import('./episodios.js');
-    if (getSerieByUrl(path)) {
-        // Redirigir internamente a /serie/...
-        const showModule = await import('./show.js');
-        showModule.renderSerie(container, path);
-        // Actualizar URL sin recargar (opcional)
-        window.history.replaceState(null, null, path);
-        header.classList.remove('header-hidden');
+    // 5. Serie (por url)
+    const serie = getSerieByUrl(path);
+    if (serie) {
+        renderSerie(container, path);
+        document.title = `${serie.titulo_serie} · Balta Media`;
         return;
     }
 
-    // 5. Si no es nada, 404
+    // 6. Episodio (por detailUrl)
+    const episodio = getEpisodioByDetailUrl(path);
+    if (episodio) {
+        renderEpisodio(container, episodio.id);
+        document.title = `${episodio.title} · Balta Media`;
+        return;
+    }
+
+    // 7. Novedades (ruta especial)
+    if (path === '/novedades') {
+        const sorted = [...DATA].sort((a, b) => new Date(b.date) - new Date(a.date));
+        const recientes = sorted.slice(0, 20);
+        const aleatorios = [...DATA].sort(() => 0.5 - Math.random()).slice(0, 10);
+        const combined = [...new Set([...recientes, ...aleatorios])];
+        renderGrid(container, combined, 'Novedades y Recomendaciones');
+        document.title = 'Novedades · Balta Media';
+        return;
+    }
+
+    // 8. No encontrado
     const module404 = await import('./404.js');
     module404.render(container);
+    document.title = 'Página no encontrada · Balta Media';
     if (module404.header === false) {
-        header.classList.add('header-hidden');
+        header.classList.add('hidden');
+        categoryFilters.classList.add('hidden');
     }
 }
 
-// Escuchar clics en enlaces con data-link
+// Evento de navegación con History API
 document.addEventListener('click', e => {
     const link = e.target.closest('a[data-link]');
     if (link) {
@@ -88,8 +116,37 @@ document.addEventListener('click', e => {
     }
 });
 
-// Manejar navegación hacia atrás/adelante
+// Botones de cerrar búsqueda (si existen)
+document.addEventListener('click', e => {
+    if (e.target.closest('#closeGridBtn')) {
+        e.preventDefault();
+        window.history.pushState(null, null, '/');
+        router();
+    }
+});
+
 window.addEventListener('popstate', router);
 
-// Iniciar router al cargar la página
+// Scroll header
+window.addEventListener('scroll', () => {
+    const st = window.pageYOffset || document.documentElement.scrollTop;
+    const topHeader = document.getElementById('main-header');
+    const mobileSearch = document.getElementById('mobileSearchBar');
+    if (!topHeader || !mobileSearch) return;
+
+    if (st > lastScrollTop && st > 100) {
+        topHeader.style.opacity = '0';
+        topHeader.style.pointerEvents = 'none';
+        mobileSearch.style.opacity = '0';
+        mobileSearch.style.pointerEvents = 'none';
+    } else {
+        topHeader.style.opacity = '1';
+        topHeader.style.pointerEvents = 'auto';
+        mobileSearch.style.opacity = '1';
+        mobileSearch.style.pointerEvents = 'auto';
+    }
+    lastScrollTop = st <= 0 ? 0 : st;
+});
+
+// Iniciar
 router();
