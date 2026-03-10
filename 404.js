@@ -9,4 +9,4 @@ export function render(container) {
     `;
 }
 
-export const header = false;
+export const header = true;
