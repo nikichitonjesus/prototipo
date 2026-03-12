@@ -1,7 +1,6 @@
-// main.js - Router principal
-
+// main.js - Router principal con soporte completo para búsqueda
 import { DATA, renderFeed, renderGrid, renderEpisodio, renderSerie } from './show.js';
-import { getEpisodioByDetailUrl, getSerieByUrl } from './episodios.js';
+import { getEpisodioByDetailUrl, getSerieByUrl, getAllEpisodios } from './episodios.js';
 import './player.js';
 
 // Páginas especiales
@@ -35,8 +34,17 @@ async function router() {
     const page = PAGES.find(p => p.path === path);
     if (page) {
         const module = await page.module();
-        module.render(container);
-        document.title = `${page.path.slice(1)} · Balta Media`;
+        
+        // Si es la página de búsqueda y tiene query, pasarlo
+        if (page.path === '/buscar' && searchParams.has('q')) {
+            const query = searchParams.get('q');
+            module.renderSearch(container, query);
+        } else {
+            module.render(container);
+        }
+        
+        document.title = `${path.slice(1).charAt(0).toUpperCase() + path.slice(2)} · Balta Media`;
+        
         if (module.header === false) {
             header.classList.add('hidden');
             categoryFilters.classList.add('hidden');
@@ -44,16 +52,7 @@ async function router() {
         return;
     }
 
-    // 3. Búsqueda (con o sin query)
-    if (path === '/buscar') {
-        const query = searchParams.get('q') || '';
-        const buscarModule = await import('./buscar.js');
-        buscarModule.renderSearch(container, query);
-        document.title = query ? `Búsqueda: ${query} · Balta Media` : 'Buscar · Balta Media';
-        return;
-    }
-
-    // 4. Categoría
+    // 3. Categoría
     if (path.startsWith('/categoria/')) {
         const cat = decodeURIComponent(path.replace('/categoria/', ''));
         const buscarModule = await import('./buscar.js');
@@ -62,7 +61,7 @@ async function router() {
         return;
     }
 
-    // 5. Serie (por url)
+    // 4. Serie (por url)
     const serie = getSerieByUrl(path);
     if (serie) {
         renderSerie(container, path);
@@ -70,7 +69,7 @@ async function router() {
         return;
     }
 
-    // 6. Episodio (por detailUrl)
+    // 5. Episodio (por detailUrl)
     const episodio = getEpisodioByDetailUrl(path);
     if (episodio) {
         renderEpisodio(container, episodio.id);
@@ -78,7 +77,7 @@ async function router() {
         return;
     }
 
-    // 7. Novedades
+    // 6. Novedades
     if (path === '/novedades') {
         const sorted = [...DATA].sort((a, b) => new Date(b.date) - new Date(a.date));
         const recientes = sorted.slice(0, 20);
@@ -89,7 +88,7 @@ async function router() {
         return;
     }
 
-    // 8. No encontrado
+    // 7. No encontrado
     const module404 = await import('./404.js');
     module404.render(container);
     document.title = 'Página no encontrada · Balta Media';
