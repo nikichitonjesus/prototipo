@@ -52,6 +52,17 @@ async function router() {
         document.title = query ? `Búsqueda: ${query} · Balta Media` : 'Buscar · Balta Media';
         return;
     }
+    // En main.js, para /buscar sin query:
+import { render as renderBuscar } from './buscar.js';
+renderBuscar(container);
+
+// Para /buscar?q=...:
+import { renderSearch } from './buscar.js';
+renderSearch(container, query);
+
+// Para /categoria/...:
+import { renderCategory } from './buscar.js';
+renderCategory(container, cat);
 
     // 4. Categoría
     if (path.startsWith('/categoria/')) {
