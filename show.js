@@ -1,4 +1,4 @@
-// show.js - Vistas del feed, episodio, serie, etc. - VERSIÓN PROFESIONALIZADA
+// show.js - Vistas del feed, episodio, serie, etc. - VERSIÓN PROFESIONALIZADA MEJORADA
 
 import { getAllEpisodios, getSerieById, getEpisodiosBySerieId, getEpisodiosConSerie } from './episodios.js';
 import { userStorage } from './storage.js';
@@ -12,7 +12,7 @@ const ICONS = {
     added: 'https://nikichitonjesus.odoo.com/web/image/1112-d141b3eb/a%C3%B1adido.png',
     dl: 'https://marca1.odoo.com/web/image/510-7a9035c1/descargar.svg',
     noDl: 'https://nikichitonjesus.odoo.com/web/image/1051-622a3db3/no-desc.webp',
-    share: 'https://marca1.odoo.com/web/image/511-3d2d2e2c/compartir.svg'
+    share: 'https://nikichitonjesus.odoo.com/web/image/585-036b7961/cpmartir.png'
 };
 
 const CATEGORIES = [
@@ -484,7 +484,7 @@ export function renderSerie(container, serieUrl) {
     container.innerHTML = html;
 }
 
-// ---------- RENDER FEED ----------
+// ---------- RENDER FEED (MEJORADO CON MÁS CARRUSELES) ----------
 export function renderFeed(container) {
     // Crear estructura de feed si no existe
     let feedView = document.getElementById('feed-view');
@@ -521,6 +521,7 @@ export function renderFeed(container) {
 
     feedView.innerHTML = '';
 
+    // ========== CARRUSELES EXISTENTES (sin cambios) ==========
     feedView.innerHTML += createCarousel("Nuevos Lanzamientos", "standard",
         getRandomSafe(15, ep => new Date(ep.date) > new Date(Date.now() - 30*24*60*60*1000)), "Todos");
 
@@ -551,6 +552,28 @@ export function renderFeed(container) {
         getRandomSafe(15, e => e.categories.includes("Otras Ciencias") ||
             e.categories.some(c => ["Ciencias Naturales", "Tecnología e Informática"].includes(c))),
         "Otras Ciencias");
+
+    // ========== NUEVOS CARRUSELES DINÁMICOS (CREATIVOS) ==========
+    feedView.innerHTML += createCarousel("Imprescindibles del Mes", "list",
+        getRandomSafe(16, e => new Date(e.date) > new Date(Date.now() - 60*24*60*60*1000)), "Todos");
+
+    feedView.innerHTML += createCarousel("Podcasts Destacados", "standard",
+        getRandomSafe(15, e => e.type === 'audio'), "Todos");
+
+    feedView.innerHTML += createCarousel("Charlas y Conferencias", "expand",
+        getRandomSafe(10, e => e.type === 'video' && (e.categories.includes("Cine y TV") || e.categories.includes("Documentales"))), "Cine y TV");
+
+    feedView.innerHTML += createCarousel("Humanidades y Sociedad", "double",
+        getRandomSafe(20, e => e.categories.some(c => ["Historia", "Filosofía", "Ciencias Sociales", "Arte y Cultura"].includes(c))), "Ciencias Sociales");
+
+    feedView.innerHTML += createCarousel("Mentes Curiosas", "standard",
+        getRandomSafe(15, e => e.categories.includes("Tecnología e Informática") || e.categories.includes("Ciencias Naturales")), "Tecnología e Informática");
+
+    feedView.innerHTML += createCarousel("Actualidad Académica", "list",
+        getRandomSafe(16, e => new Date(e.date) > new Date(Date.now() - 45*24*60*60*1000)), "Todos");
+
+    feedView.innerHTML += createCarousel("Mix de Saberes", "double",
+        getRandomSafe(20), "Todos");
 }
 
 // ---------- RENDER GRID (resultados de búsqueda/categoría) ----------
