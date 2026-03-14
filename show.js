@@ -120,38 +120,27 @@ export function createVideoExpand(ep) {
     </div>`;
 }
 
-// Reemplaza la función createListItem con esta versión mejorada
-
 export function createListItem(ep, idx) {
     const inPlaylist = userStorage.playlist.has(ep.id);
     const addIcon = inPlaylist ? ICONS.added : ICONS.add;
 
-    return `<div class="list-item group flex items-center gap-3 py-2 px-2 rounded-lg hover:bg-white/5 transition-colors" data-episodio-id="${ep.id}">
-        <!-- Número fijo -->
-        <span class="text-gray-500 font-bold text-sm w-6 text-center flex-shrink-0">${idx + 1}</span>
-        
-        <!-- Cover clicable -->
-        <div class="relative w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden cursor-pointer" onclick="window.goToDetail('${ep.detailUrl}')">
+    return `<div class="list-item group" data-episodio-id="${ep.id}">
+        <span class="text-gray-500 font-bold w-6 text-center text-sm">${idx + 1}</span>
+        <div class="relative w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 rounded-lg overflow-hidden cursor-pointer" onclick="window.goToDetail('${ep.detailUrl}')">
             <img src="${ep.coverUrl}" class="w-full h-full object-cover" loading="lazy">
-            <div class="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center" onclick="window.handlePlay(event, '${ep.id}'); return false;">
-                <img src="${ICONS.play}" class="w-6 h-6">
-            </div>
+            <div class="overlay-mini" onclick="window.handlePlay(event, '${ep.id}'); return false;"><img src="${ICONS.play}" class="play-icon-sm"></div>
         </div>
-        
-        <!-- Título y autor en contenedor flexible con truncado forzado -->
-        <div class="flex-1 min-w-0" onclick="window.goToDetail('${ep.detailUrl}')">
-            <h4 class="font-bold text-sm text-white truncate hover:text-blue-400 transition-colors">${ep.title}</h4>
+        <div class="item-content cursor-pointer flex-1 min-w-0" onclick="window.goToDetail('${ep.detailUrl}')">
+            <h4 class="font-bold text-sm truncate text-white group-hover:text-blue-400 transition-colors">${ep.title}</h4>
             <p class="text-xs text-gray-500 truncate">${ep.author}</p>
         </div>
-        
-        <!-- Acciones siempre a la derecha -->
-        <div class="flex items-center gap-2 flex-shrink-0">
-            <button class="lg:opacity-0 lg:group-hover:opacity-100 transition-opacity w-8 h-8 rounded-lg bg-black/40 backdrop-blur-sm border border-white/10 hover:bg-white/20 flex items-center justify-center" onclick="window.handleAdd(event, '${ep.id}'); return false;" title="Añadir a lista">
+        <div class="item-actions flex items-center gap-2 flex-shrink-0">
+            <button class="lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-200 w-8 h-8 rounded-lg bg-black/40 backdrop-blur-sm border border-white/10 hover:bg-white/20 flex items-center justify-center" onclick="window.handleAdd(event, '${ep.id}'); return false;">
                 <img src="${addIcon}" alt="Agregar" class="w-4 h-4" data-episodio-id="${ep.id}" data-added="${inPlaylist}">
             </button>
-            <button class="lg:hidden w-8 h-8 rounded-lg bg-[#7b2eda] flex items-center justify-center" onclick="window.handlePlay(event, '${ep.id}'); return false;" title="Reproducir">
+            <div class="lg:hidden mobile-play-btn w-8 h-8 rounded-lg bg-[#7b2eda] flex items-center justify-center" onclick="window.handlePlay(event, '${ep.id}'); return false;">
                 <img src="${ICONS.play}" alt="Play" class="w-4 h-4">
-            </button>
+            </div>
         </div>
     </div>`;
 }
