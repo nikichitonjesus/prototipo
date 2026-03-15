@@ -2,7 +2,6 @@
 
 import { getAllEpisodios, getSerieById, getEpisodiosBySerieId, getEpisodiosConSerie } from './episodios.js';
 import { userStorage } from './storage.js';
-import './player.js';
 
 // ---------- CONSTANTES ----------
 const ICONS = {
