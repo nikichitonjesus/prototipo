@@ -703,6 +703,94 @@
     #timerCountdown[style*="none"], #timerOptions[style*="none"] {
       display: none !important;
     }
+    /* Reproductor minimizado - contenedor principal */
+.player-minimized {
+  height: 70px;               /* un poco más alto para respirar mejor */
+  padding: 8px 12px;          /* reduce un poco el padding lateral si quieres más espacio */
+  background: #222;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.4);
+}
+
+/* Contenedor de la portada minimizada */
+.minimized-cover {
+  width: 54px;                /* tamaño fijo recomendado: 48–56px */
+  height: 54px;
+  flex-shrink: 0;             /* ¡importante! evita que se achique */
+  margin-right: 12px;         /* separación con el título */
+  border-radius: 6px;
+  overflow: hidden;
+  background: #111;
+}
+
+.minimized-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;          /* recorta si es necesario, pero mantiene proporción */
+  object-position: center;
+  display: block;
+}
+
+/* Título y subtítulo (si lo hubiera) */
+.minimized-title-container {
+  flex: 1;                    /* ocupa todo el espacio restante */
+  min-width: 0;               /* permite que el texto se corte con ellipsis */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.minimized-title {
+  font-size: 14px;            /* un poco más pequeño que el expanded */
+  font-weight: 600;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+  margin-bottom: 2px;
+}
+
+/* Controles minimizados */
+.minimized-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;                   /* reduce separación si sientes que ocupa mucho */
+  flex-shrink: 0;
+}
+
+.minimized-controls button {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: transparent;
+}
+
+.minimized-controls img {
+  width: 24px;
+  height: 24px;
+}
+
+/* Ajuste extra para pantallas muy pequeñas */
+@media (max-width: 360px) {
+  .player-minimized {
+    height: 64px;
+    padding: 6px 10px;
+  }
+  .minimized-cover {
+    width: 48px;
+    height: 48px;
+    margin-right: 10px;
+  }
+  .minimized-title {
+    font-size: 13px;
+  }
+  .minimized-controls img {
+    width: 22px;
+    height: 22px;
+  }
+}
   `;
   document.head.appendChild(style);
 
