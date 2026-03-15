@@ -16,13 +16,11 @@
     
     <!-- Estilos base para la sidebar -->
     <style id="sidebar-base-styles">
-        /* Estos estilos aseguran que la sidebar siempre esté presente */
         body {
             margin: 0;
             transition: margin-left 0.3s ease;
         }
         
-        /* Ajustes para los elementos sticky */
         #main-header, #category-filters {
             transition: left 0.3s ease, width 0.3s ease !important;
         }
@@ -35,7 +33,6 @@
             transition: left 0.3s ease, width 0.3s ease !important;
         }
         
-        /* En móvil, resetear todo */
         @media (max-width: 768px) {
             body, #main-header, #category-filters, #content, .player-universal {
                 margin-left: 0 !important;
@@ -48,7 +45,7 @@
 </head>
 <body class="bg-[#050505] text-white font-[Plus_Jakarta_Sans] overflow-x-hidden">
 
-<!-- Search overlay (para móvil) - ya no se usa, pero lo dejamos por si acaso -->
+<!-- Search overlay (para móvil) -->
 <div class="search-overlay" id="searchOverlay"></div>
 
 <!-- Header principal (sticky) -->
@@ -79,574 +76,39 @@
     </div>
 </div>
 
-<!-- Contenedor principal donde se inyectan las vistas -->
-<main id="content" class="max-w-[1600px] mx-auto px-4 sm:px-6 mt-4 min-h-screen"></main>
+<!-- ================================================ -->
+<!-- 🟢 ESPACIO PARA EL REPRODUCTOR UNIVERSAL 🟢 -->
+<!-- ================================================ -->
+<!-- 
+    INSTRUCCIÓN: PEGA AQUÍ TODO EL CÓDIGO DE TU REPRODUCTOR
+    - El código completo que me mostraste (desde <!DOCTYPE html> hasta </html>)
+    - PERO SOLO PEGA EL CONTENIDO DENTRO DEL <body> de tu reproductor
+    - Es decir, NO incluyas <html>, <head>, ni <body> duplicados
+    - Pega todo desde <div id="playerUniversal" class="player-universal"> hasta el último </script>
+-->
 
-<!-- Modal de error (opcional) -->
-<div id="errorModal" class="fixed inset-0 z-[10000] flex items-center justify-center hidden" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(4px);">
-    <div class="bg-[#1e1e2f] rounded-2xl max-w-md w-full p-6 border border-white/10 shadow-2xl">
-        <h3 class="text-xl font-bold text-white mb-3" id="errorModalTitle">Error</h3>
-        <p class="text-gray-300 mb-6" id="errorModalMessage"></p>
-        <div class="flex flex-col sm:flex-row gap-3 justify-end">
-            <a href="https://www.baltaanay.org/contactus" target="_blank" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white text-sm font-semibold text-center">Reportar problema</a>
-            <a href="https://www.baltaanay.org/solicitar" target="_blank" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-white text-sm font-semibold text-center">Solicitar</a>
-            <button id="closeErrorModal" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-white text-sm font-semibold">Cerrar</button>
+<!-- 👇👇👇 COMIENZA A PEGAR AQUÍ 👇👇👇 -->
+<!-- (Pega aquí el contenido de tu reproductor) -->
+
+<!-- 
+    EJEMPLO DE LO QUE DEBES PEGAR (solo como referencia):
+    
+    <div id="playerUniversal" class="player-universal">
+        <div id="playerExpanded" class="player-expanded" style="display: none;">
+            ... todo el contenido del reproductor ...
+        </div>
+        <div id="playerMinimized" class="player-minimized">
+            ... todo el contenido minimizado ...
         </div>
     </div>
-</div>
-
-<!-- Script de la barra lateral (MEJORADO PARA SPA) -->
-<script>
-(function() {
-    // ==========================================================================
-    // CONFIGURACIÓN
-    // ==========================================================================
-    const SIDEBAR_CONFIG = {
-        BREAKPOINT: 768,
-        COLOR: '#0F0F0F',
-        WIDTH_EXPANDED: '15%',
-        WIDTH_COLLAPSED: '70px',
-        MIN_WIDTH_EXPANDED: '180px'
-    };
-
-    // ==========================================================================
-    // ESTADO GLOBAL
-    // ==========================================================================
-    let sidebarInstance = {
-        initialized: false,
-        currentState: localStorage.getItem('sidebar_state') || 'collapsed', // 'collapsed' o 'expanded'
-        isMobile: window.innerWidth <= SIDEBAR_CONFIG.BREAKPOINT
-    };
-
-    // ==========================================================================
-    // ESTILOS
-    // ==========================================================================
-    const sidebarStyles = `
-        /* ===== BARRA LATERAL ===== */
-        .sidebar-desktop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            background: ${SIDEBAR_CONFIG.COLOR};
-            color: #fff;
-            z-index: 900;
-            transition: width 0.3s ease;
-            overflow-x: hidden;
-            overflow-y: auto;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.5);
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-        .sidebar-desktop::-webkit-scrollbar {
-            display: none;
-        }
-        .sidebar-desktop.collapsed {
-            width: ${SIDEBAR_CONFIG.WIDTH_COLLAPSED};
-        }
-        .sidebar-desktop.expanded {
-            width: ${SIDEBAR_CONFIG.WIDTH_EXPANDED};
-            min-width: ${SIDEBAR_CONFIG.MIN_WIDTH_EXPANDED};
-        }
-        
-        @media (max-width: ${SIDEBAR_CONFIG.BREAKPOINT}px) {
-            .sidebar-desktop {
-                display: none !important;
-            }
-        }
-
-        /* Botón toggle */
-        .sidebar-toggle {
-            display: flex;
-            justify-content: flex-end;
-            padding: 16px 12px;
-            cursor: pointer;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 20px;
-        }
-        .sidebar-toggle svg {
-            width: 24px;
-            height: 24px;
-            fill: white;
-            transition: transform 0.2s;
-        }
-        .sidebar-desktop.expanded .sidebar-toggle svg {
-            transform: rotate(180deg);
-        }
-
-        /* Navegación */
-        .sidebar-nav {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            padding: 0 8px;
-            margin-bottom: 30px;
-        }
-        .sidebar-nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: white;
-            text-decoration: none;
-            padding: 10px;
-            border-radius: 8px;
-            white-space: nowrap;
-            transition: background 0.2s;
-        }
-        .sidebar-nav-item:hover {
-            background: rgba(255,255,255,0.1);
-        }
-        .sidebar-nav-item.active {
-            background: rgba(255,255,255,0.2);
-        }
-        .sidebar-nav-item img {
-            width: 24px;
-            height: 24px;
-            filter: brightness(1.2);
-            flex-shrink: 0;
-        }
-        .sidebar-nav-item span {
-            font-size: 14px;
-            font-weight: 500;
-            transition: opacity 0.2s;
-        }
-        .sidebar-desktop.collapsed .sidebar-nav-item span {
-            display: none;
-        }
-
-        /* Sección de recomendados */
-        .sidebar-desktop.collapsed .sidebar-rec-section {
-            display: none;
-        }
-        .sidebar-rec-section {
-            padding: 0 8px;
-            margin-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 16px;
-        }
-        .sidebar-rec-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-        .sidebar-rec-header a {
-            color: white;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            opacity: 0.9;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .sidebar-rec-header a:hover {
-            opacity: 1;
-        }
-        .sidebar-rec-header svg {
-            width: 16px;
-            height: 16px;
-            fill: white;
-        }
-        .sidebar-rec-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .sidebar-rec-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13px;
-        }
-        .sidebar-rec-item-info {
-            flex: 1;
-            min-width: 0;
-        }
-        .sidebar-rec-item-title {
-            font-weight: 500;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .sidebar-rec-item-author {
-            font-size: 11px;
-            opacity: 0.7;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .sidebar-rec-play-btn {
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-        }
-        .sidebar-rec-play-btn:hover {
-            background: rgba(255,255,255,0.2);
-        }
-        .sidebar-rec-play-btn svg {
-            width: 18px;
-            height: 18px;
-            fill: white;
-        }
-    `;
-
-    // ==========================================================================
-    // FUNCIONES DE UTILIDAD
-    // ==========================================================================
-    function injectSidebarStyles() {
-        if (document.getElementById('sidebar-desktop-styles')) return;
-        const style = document.createElement('style');
-        style.id = 'sidebar-desktop-styles';
-        style.textContent = sidebarStyles;
-        document.head.appendChild(style);
-    }
-
-    function getRecommendations() {
-        try {
-            return window.RECOMENDADOS || [];
-        } catch (e) {
-            return [];
-        }
-    }
-
-    function adjustLayout(expanded) {
-        if (sidebarInstance.isMobile) return;
-        
-        const width = expanded ? SIDEBAR_CONFIG.WIDTH_EXPANDED : SIDEBAR_CONFIG.WIDTH_COLLAPSED;
-        
-        // Ajustar body
-        document.body.style.marginLeft = width;
-        
-        // Ajustar header
-        const header = document.getElementById('main-header');
-        if (header) {
-            header.style.left = width;
-            header.style.width = `calc(100% - ${width})`;
-        }
-        
-        // Ajustar categorías
-        const categories = document.getElementById('category-filters');
-        if (categories) {
-            categories.style.left = width;
-            categories.style.width = `calc(100% - ${width})`;
-        }
-        
-        // Ajustar contenido
-        const content = document.getElementById('content');
-        if (content) {
-            content.style.marginLeft = width;
-            content.style.maxWidth = `calc(1600px - ${width})`;
-        }
-        
-        // Ajustar reproductor
-        const player = document.querySelector('.player-universal');
-        if (player) {
-            player.style.left = width;
-            player.style.width = `calc(100% - ${width})`;
-        }
-        
-        // Guardar estado
-        localStorage.setItem('sidebar_state', expanded ? 'expanded' : 'collapsed');
-        sidebarInstance.currentState = expanded ? 'expanded' : 'collapsed';
-    }
-
-    function resetLayout() {
-        document.body.style.marginLeft = '';
-        
-        const header = document.getElementById('main-header');
-        if (header) {
-            header.style.left = '';
-            header.style.width = '';
-        }
-        
-        const categories = document.getElementById('category-filters');
-        if (categories) {
-            categories.style.left = '';
-            categories.style.width = '';
-        }
-        
-        const content = document.getElementById('content');
-        if (content) {
-            content.style.marginLeft = '';
-            content.style.maxWidth = '';
-        }
-        
-        const player = document.querySelector('.player-universal');
-        if (player) {
-            player.style.left = '';
-            player.style.width = '';
-        }
-    }
-
-    // ==========================================================================
-    // RENDERIZADO DE LA SIDEBAR
-    // ==========================================================================
-    function renderSidebar() {
-        const sidebar = document.createElement('aside');
-        sidebar.className = `sidebar-desktop ${sidebarInstance.currentState}`;
-        sidebar.id = 'sidebarDesktop';
-
-        // Botón toggle
-        const toggle = document.createElement('div');
-        toggle.className = 'sidebar-toggle';
-        toggle.id = 'sidebarDesktopToggle';
-        toggle.innerHTML = '<svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>';
-
-        // Navegación
-        const nav = document.createElement('div');
-        nav.className = 'sidebar-nav';
-        nav.innerHTML = `
-            <a href="/" class="sidebar-nav-item" title="Home" data-link>
-                <img src="https://media.baltaanay.org/web/image/798-1b947c8d/Home%20%282%29.webp" alt="Home" loading="lazy">
-                <span>Home</span>
-            </a>
-            <a href="/buscar" class="sidebar-nav-item" title="Explorar" data-link>
-                <img src="https://www.baltaanay.org/web/image/986-2bf9d2bb/Search%20%282%29.webp" alt="Explorar" loading="lazy">
-                <span>Explorar</span>
-            </a>
-            <a href="/subir" class="sidebar-nav-item" title="Cargar" data-link>
-                <img src="https://www.baltaanay.org/web/image/991-1c3c204a/subir.webp" alt="Cargar" loading="lazy">
-                <span>Cargar</span>
-            </a>
-            <a href="https://www.baltaanay.org/solicitud" class="sidebar-nav-item" title="Solicitar">
-                <img src="https://www.baltaanay.org/web/image/922-f3d79ca9/xhbalta-aula.png" alt="Solicitar" loading="lazy">
-                <span>Solicitar</span>
-            </a>
-            <a href="/my/home" class="sidebar-nav-item" title="Usuario" data-link>
-                <img src="https://nikichitonjesus3.odoo.com/web/image/453-f4d8c1eb/user.png" alt="Usuario" loading="lazy">
-                <span>Portal</span>
-            </a>
-        `;
-
-        // Sección recomendados
-        const recSection = document.createElement('div');
-        recSection.className = 'sidebar-rec-section';
-        recSection.innerHTML = `
-            <div class="sidebar-rec-header">
-                <a href="/novedades" data-link>
-                    Recomendados
-                    <svg viewBox="0 0 24 24"><path d="M14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
-                </a>
-            </div>
-            <div class="sidebar-rec-list" id="sidebarRecList"></div>
-        `;
-
-        sidebar.appendChild(toggle);
-        sidebar.appendChild(nav);
-        sidebar.appendChild(recSection);
-        return sidebar;
-    }
-
-    function populateRecommendations() {
-        const container = document.getElementById('sidebarRecList');
-        if (!container) return;
-
-        const episodes = getRecommendations();
-
-        if (!episodes.length) {
-            container.innerHTML = '<div style="color:#aaa; padding:8px;">No hay recomendados</div>';
-            return;
-        }
-
-        container.innerHTML = '';
-        episodes.forEach(ep => {
-            const title = ep.title || 'Sin título';
-            const author = ep.author || (ep.series?.titulo_serie) || 'Desconocido';
-            const item = document.createElement('div');
-            item.className = 'sidebar-rec-item';
-            item.innerHTML = `
-                <div class="sidebar-rec-item-info">
-                    <div class="sidebar-rec-item-title">${title}</div>
-                    <div class="sidebar-rec-item-author">${author}</div>
-                </div>
-                <button class="sidebar-rec-play-btn" data-episode='${JSON.stringify(ep).replace(/'/g, "&#39;")}'>
-                    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                </button>
-            `;
-            
-            const btn = item.querySelector('.sidebar-rec-play-btn');
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const epData = JSON.parse(btn.dataset.episode);
-                if (typeof window.playEpisodeExpanded === 'function') {
-                    window.playEpisodeExpanded(
-                        epData.mediaUrl || '',
-                        epData.type || 'audio',
-                        epData.coverUrl || '',
-                        epData.series?.portada_serie || epData.coverUrl || '',
-                        epData.title || '',
-                        epData.detailUrl || '',
-                        epData.author || (epData.series?.titulo_serie) || 'Roberto',
-                        epData.next || [],
-                        epData.description || '',
-                        true
-                    );
-                }
-            });
-            container.appendChild(item);
-        });
-    }
-
-    function setActiveNavItem() {
-        const currentPath = window.location.pathname;
-        document.querySelectorAll('.sidebar-nav-item').forEach(item => {
-            const href = item.getAttribute('href');
-            item.classList.toggle('active', 
-                (href === currentPath) || 
-                (href === '/' && currentPath === '/') ||
-                (href === '/buscar' && currentPath === '/buscar')
-            );
-        });
-    }
-
-    function initSidebarToggle() {
-        const sidebar = document.getElementById('sidebarDesktop');
-        const toggle = document.getElementById('sidebarDesktopToggle');
-        if (!sidebar || !toggle) return;
-
-        // Remover listeners anteriores
-        const newToggle = toggle.cloneNode(true);
-        toggle.parentNode.replaceChild(newToggle, toggle);
-        
-        newToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            
-            const isCollapsed = sidebar.classList.contains('collapsed');
-            if (isCollapsed) {
-                sidebar.classList.remove('collapsed');
-                sidebar.classList.add('expanded');
-                adjustLayout(true);
-            } else {
-                sidebar.classList.add('collapsed');
-                sidebar.classList.remove('expanded');
-                adjustLayout(false);
-            }
-        });
-    }
-
-    // ==========================================================================
-    // INICIALIZACIÓN PRINCIPAL
-    // ==========================================================================
-    function initSidebar() {
-        // Actualizar estado mobile
-        sidebarInstance.isMobile = window.innerWidth <= SIDEBAR_CONFIG.BREAKPOINT;
-        
-        // Eliminar sidebar existente
-        const oldSidebar = document.querySelector('.sidebar-desktop');
-        if (oldSidebar) oldSidebar.remove();
-        
-        // Si es mobile, resetear layout y salir
-        if (sidebarInstance.isMobile) {
-            resetLayout();
-            return;
-        }
-        
-        // Inyectar estilos si no existen
-        injectSidebarStyles();
-        
-        // Renderizar sidebar
-        const sidebar = renderSidebar();
-        document.body.insertBefore(sidebar, document.body.firstChild);
-        
-        // Poblar recomendaciones
-        populateRecommendations();
-        
-        // Inicializar toggle
-        initSidebarToggle();
-        
-        // Marcar item activo
-        setActiveNavItem();
-        
-        // Aplicar layout según estado guardado
-        adjustLayout(sidebarInstance.currentState === 'expanded');
-        
-        // Marcar como inicializado
-        sidebarInstance.initialized = true;
-        
-        console.log('✅ Sidebar inicializada correctamente');
-    }
-
-    // ==========================================================================
-    // EVENTOS Y WATCHERS
-    // ==========================================================================
     
-    // Inicializar cuando el DOM esté listo
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initSidebar);
-    } else {
-        initSidebar();
-    }
+    <script>
+        // Todo tu JavaScript del reproductor
+        // (sin incluir etiquetas <html>, <head>, <body>)
+    </script>
+-->
 
-    // Escuchar cambios de tamaño de ventana
-    window.addEventListener('resize', () => {
-        const wasMobile = sidebarInstance.isMobile;
-        const isMobileNow = window.innerWidth <= SIDEBAR_CONFIG.BREAKPOINT;
-        
-        if (wasMobile !== isMobileNow) {
-            sidebarInstance.isMobile = isMobileNow;
-            initSidebar();
-        }
-    });
-
-    // Escuchar navegación SPA para actualizar item activo
-    document.addEventListener('spa-navigation', setActiveNavItem);
-    window.addEventListener('popstate', setActiveNavItem);
-
-    // Exponer API pública
-    window.sidebarAPI = {
-        refresh: populateRecommendations,
-        setActive: setActiveNavItem,
-        toggle: () => {
-            const sidebar = document.getElementById('sidebarDesktop');
-            if (sidebar) {
-                const isCollapsed = sidebar.classList.contains('collapsed');
-                if (isCollapsed) {
-                    sidebar.classList.remove('collapsed');
-                    sidebar.classList.add('expanded');
-                    adjustLayout(true);
-                } else {
-                    sidebar.classList.add('collapsed');
-                    sidebar.classList.remove('expanded');
-                    adjustLayout(false);
-                }
-            }
-        },
-        expand: () => {
-            const sidebar = document.getElementById('sidebarDesktop');
-            if (sidebar && sidebar.classList.contains('collapsed')) {
-                sidebar.classList.remove('collapsed');
-                sidebar.classList.add('expanded');
-                adjustLayout(true);
-            }
-        },
-        collapse: () => {
-            const sidebar = document.getElementById('sidebarDesktop');
-            if (sidebar && sidebar.classList.contains('expanded')) {
-                sidebar.classList.add('collapsed');
-                sidebar.classList.remove('expanded');
-                adjustLayout(false);
-            }
-        }
-    };
-})();
-</script>
-
-<!-- Script principal (tipo módulo) -->
-<script type="module" src="/main.js"></script>
-</body>
-</html>
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -3786,5 +3248,420 @@ window.addEventListener('beforeunload', () => {
 });
 </script>
 
+<!-- 👆👆👆 TERMINA DE PEGAR AQUÍ 👆👆👆 -->
+<!-- ================================================ -->
+
+<!-- Contenedor principal (SÓLO ESTO CAMBIA CON LA NAVEGACIÓN) -->
+<main id="content" class="max-w-[1600px] mx-auto px-4 sm:px-6 mt-4 min-h-screen"></main>
+
+<!-- Modal de error (opcional) -->
+<div id="errorModal" class="fixed inset-0 z-[10000] flex items-center justify-center hidden" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(4px);">
+    <div class="bg-[#1e1e2f] rounded-2xl max-w-md w-full p-6 border border-white/10 shadow-2xl">
+        <h3 class="text-xl font-bold text-white mb-3" id="errorModalTitle">Error</h3>
+        <p class="text-gray-300 mb-6" id="errorModalMessage"></p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-end">
+            <a href="https://www.baltaanay.org/contactus" target="_blank" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white text-sm font-semibold text-center">Reportar problema</a>
+            <a href="https://www.baltaanay.org/solicitar" target="_blank" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-white text-sm font-semibold text-center">Solicitar</a>
+            <button id="closeErrorModal" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-white text-sm font-semibold">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Script de la barra lateral (MEJORADO PARA SPA) -->
+<script>
+(function() {
+    // ==========================================================================
+    // CONFIGURACIÓN
+    // ==========================================================================
+    const SIDEBAR_CONFIG = {
+        BREAKPOINT: 768,
+        COLOR: '#0F0F0F',
+        WIDTH_EXPANDED: '15%',
+        WIDTH_COLLAPSED: '70px',
+        MIN_WIDTH_EXPANDED: '180px'
+    };
+
+    // ==========================================================================
+    // ESTADO GLOBAL
+    // ==========================================================================
+    let sidebarInstance = {
+        initialized: false,
+        currentState: localStorage.getItem('sidebar_state') || 'collapsed',
+        isMobile: window.innerWidth <= SIDEBAR_CONFIG.BREAKPOINT
+    };
+
+    // ==========================================================================
+    // ESTILOS
+    // ==========================================================================
+    const sidebarStyles = `
+        .sidebar-desktop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            background: ${SIDEBAR_CONFIG.COLOR};
+            color: #fff;
+            z-index: 900;
+            transition: width 0.3s ease;
+            overflow-x: hidden;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .sidebar-desktop::-webkit-scrollbar { display: none; }
+        .sidebar-desktop.collapsed { width: ${SIDEBAR_CONFIG.WIDTH_COLLAPSED}; }
+        .sidebar-desktop.expanded { width: ${SIDEBAR_CONFIG.WIDTH_EXPANDED}; min-width: ${SIDEBAR_CONFIG.MIN_WIDTH_EXPANDED}; }
+        
+        @media (max-width: ${SIDEBAR_CONFIG.BREAKPOINT}px) {
+            .sidebar-desktop { display: none !important; }
+        }
+
+        .sidebar-toggle {
+            display: flex;
+            justify-content: flex-end;
+            padding: 16px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        .sidebar-toggle svg { width: 24px; height: 24px; fill: white; transition: transform 0.2s; }
+        .sidebar-desktop.expanded .sidebar-toggle svg { transform: rotate(180deg); }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 0 8px;
+            margin-bottom: 30px;
+        }
+        .sidebar-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 8px;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+        .sidebar-nav-item:hover { background: rgba(255,255,255,0.1); }
+        .sidebar-nav-item.active { background: rgba(255,255,255,0.2); }
+        .sidebar-nav-item img { width: 24px; height: 24px; filter: brightness(1.2); flex-shrink: 0; }
+        .sidebar-nav-item span { font-size: 14px; font-weight: 500; transition: opacity 0.2s; }
+        .sidebar-desktop.collapsed .sidebar-nav-item span { display: none; }
+
+        .sidebar-desktop.collapsed .sidebar-rec-section { display: none; }
+        .sidebar-rec-section {
+            padding: 0 8px;
+            margin-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 16px;
+        }
+        .sidebar-rec-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .sidebar-rec-header a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .sidebar-rec-header a:hover { opacity: 1; }
+        .sidebar-rec-header svg { width: 16px; height: 16px; fill: white; }
+        .sidebar-rec-list { display: flex; flex-direction: column; gap: 12px; }
+        .sidebar-rec-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+        .sidebar-rec-item-info { flex: 1; min-width: 0; }
+        .sidebar-rec-item-title { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sidebar-rec-item-author { font-size: 11px; opacity: 0.7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sidebar-rec-play-btn {
+            background: none; border: none; color: white; cursor: pointer; padding: 4px 8px; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center; transition: background 0.2s;
+        }
+        .sidebar-rec-play-btn:hover { background: rgba(255,255,255,0.2); }
+        .sidebar-rec-play-btn svg { width: 18px; height: 18px; fill: white; }
+    `;
+
+    function injectSidebarStyles() {
+        if (document.getElementById('sidebar-desktop-styles')) return;
+        const style = document.createElement('style');
+        style.id = 'sidebar-desktop-styles';
+        style.textContent = sidebarStyles;
+        document.head.appendChild(style);
+    }
+
+    function getRecommendations() {
+        try { return window.RECOMENDADOS || []; } catch (e) { return []; }
+    }
+
+    function adjustLayout(expanded) {
+        if (sidebarInstance.isMobile) return;
+        const width = expanded ? SIDEBAR_CONFIG.WIDTH_EXPANDED : SIDEBAR_CONFIG.WIDTH_COLLAPSED;
+        
+        document.body.style.marginLeft = width;
+        
+        const header = document.getElementById('main-header');
+        if (header) { header.style.left = width; header.style.width = `calc(100% - ${width})`; }
+        
+        const categories = document.getElementById('category-filters');
+        if (categories) { categories.style.left = width; categories.style.width = `calc(100% - ${width})`; }
+        
+        const content = document.getElementById('content');
+        if (content) { content.style.marginLeft = width; content.style.maxWidth = `calc(1600px - ${width})`; }
+        
+        const player = document.querySelector('.player-universal');
+        if (player) { player.style.left = width; player.style.width = `calc(100% - ${width})`; }
+        
+        localStorage.setItem('sidebar_state', expanded ? 'expanded' : 'collapsed');
+        sidebarInstance.currentState = expanded ? 'expanded' : 'collapsed';
+    }
+
+    function resetLayout() {
+        document.body.style.marginLeft = '';
+        
+        const header = document.getElementById('main-header');
+        if (header) { header.style.left = ''; header.style.width = ''; }
+        
+        const categories = document.getElementById('category-filters');
+        if (categories) { categories.style.left = ''; categories.style.width = ''; }
+        
+        const content = document.getElementById('content');
+        if (content) { content.style.marginLeft = ''; content.style.maxWidth = ''; }
+        
+        const player = document.querySelector('.player-universal');
+        if (player) { player.style.left = ''; player.style.width = ''; }
+    }
+
+    function renderSidebar() {
+        const sidebar = document.createElement('aside');
+        sidebar.className = `sidebar-desktop ${sidebarInstance.currentState}`;
+        sidebar.id = 'sidebarDesktop';
+
+        const toggle = document.createElement('div');
+        toggle.className = 'sidebar-toggle';
+        toggle.id = 'sidebarDesktopToggle';
+        toggle.innerHTML = '<svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>';
+
+        const nav = document.createElement('div');
+        nav.className = 'sidebar-nav';
+        nav.innerHTML = `
+            <a href="/" class="sidebar-nav-item" title="Home" data-link>
+                <img src="https://media.baltaanay.org/web/image/798-1b947c8d/Home%20%282%29.webp" alt="Home" loading="lazy"><span>Home</span>
+            </a>
+            <a href="/buscar" class="sidebar-nav-item" title="Explorar" data-link>
+                <img src="https://www.baltaanay.org/web/image/986-2bf9d2bb/Search%20%282%29.webp" alt="Explorar" loading="lazy"><span>Explorar</span>
+            </a>
+            <a href="/subir" class="sidebar-nav-item" title="Cargar" data-link>
+                <img src="https://www.baltaanay.org/web/image/991-1c3c204a/subir.webp" alt="Cargar" loading="lazy"><span>Cargar</span>
+            </a>
+            <a href="https://www.baltaanay.org/solicitud" class="sidebar-nav-item" title="Solicitar">
+                <img src="https://www.baltaanay.org/web/image/922-f3d79ca9/xhbalta-aula.png" alt="Solicitar" loading="lazy"><span>Solicitar</span>
+            </a>
+            <a href="/my/home" class="sidebar-nav-item" title="Usuario" data-link>
+                <img src="https://nikichitonjesus3.odoo.com/web/image/453-f4d8c1eb/user.png" alt="Usuario" loading="lazy"><span>Portal</span>
+            </a>
+        `;
+
+        const recSection = document.createElement('div');
+        recSection.className = 'sidebar-rec-section';
+        recSection.innerHTML = `
+            <div class="sidebar-rec-header">
+                <a href="/novedades" data-link>Recomendados<svg viewBox="0 0 24 24"><path d="M14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg></a>
+            </div>
+            <div class="sidebar-rec-list" id="sidebarRecList"></div>
+        `;
+
+        sidebar.appendChild(toggle);
+        sidebar.appendChild(nav);
+        sidebar.appendChild(recSection);
+        return sidebar;
+    }
+
+    function populateRecommendations() {
+        const container = document.getElementById('sidebarRecList');
+        if (!container) return;
+
+        const episodes = getRecommendations();
+
+        if (!episodes.length) {
+            container.innerHTML = '<div style="color:#aaa; padding:8px;">No hay recomendados</div>';
+            return;
+        }
+
+        container.innerHTML = '';
+        episodes.forEach(ep => {
+            const title = ep.title || 'Sin título';
+            const author = ep.author || (ep.series?.titulo_serie) || 'Desconocido';
+            const item = document.createElement('div');
+            item.className = 'sidebar-rec-item';
+            item.innerHTML = `
+                <div class="sidebar-rec-item-info">
+                    <div class="sidebar-rec-item-title">${title}</div>
+                    <div class="sidebar-rec-item-author">${author}</div>
+                </div>
+                <button class="sidebar-rec-play-btn" data-episode='${JSON.stringify(ep).replace(/'/g, "&#39;")}'>
+                    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+            `;
+            
+            const btn = item.querySelector('.sidebar-rec-play-btn');
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const epData = JSON.parse(btn.dataset.episode);
+                if (typeof window.playEpisodeExpanded === 'function') {
+                    window.playEpisodeExpanded(
+                        epData.mediaUrl || '',
+                        epData.type || 'audio',
+                        epData.coverUrl || '',
+                        epData.series?.portada_serie || epData.coverUrl || '',
+                        epData.title || '',
+                        epData.detailUrl || '',
+                        epData.author || (epData.series?.titulo_serie) || 'Roberto',
+                        epData.next || [],
+                        epData.description || '',
+                        true
+                    );
+                }
+            });
+            container.appendChild(item);
+        });
+    }
+
+    function setActiveNavItem() {
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.sidebar-nav-item').forEach(item => {
+            const href = item.getAttribute('href');
+            item.classList.toggle('active', 
+                (href === currentPath) || 
+                (href === '/' && currentPath === '/') ||
+                (href === '/buscar' && currentPath === '/buscar')
+            );
+        });
+    }
+
+    function initSidebarToggle() {
+        const sidebar = document.getElementById('sidebarDesktop');
+        const toggle = document.getElementById('sidebarDesktopToggle');
+        if (!sidebar || !toggle) return;
+
+        const newToggle = toggle.cloneNode(true);
+        toggle.parentNode.replaceChild(newToggle, toggle);
+        
+        newToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            if (isCollapsed) {
+                sidebar.classList.remove('collapsed');
+                sidebar.classList.add('expanded');
+                adjustLayout(true);
+            } else {
+                sidebar.classList.add('collapsed');
+                sidebar.classList.remove('expanded');
+                adjustLayout(false);
+            }
+        });
+    }
+
+    function initSidebar() {
+        sidebarInstance.isMobile = window.innerWidth <= SIDEBAR_CONFIG.BREAKPOINT;
+        
+        const oldSidebar = document.querySelector('.sidebar-desktop');
+        if (oldSidebar) oldSidebar.remove();
+        
+        if (sidebarInstance.isMobile) {
+            resetLayout();
+            return;
+        }
+        
+        injectSidebarStyles();
+        
+        const sidebar = renderSidebar();
+        document.body.insertBefore(sidebar, document.body.firstChild);
+        
+        populateRecommendations();
+        initSidebarToggle();
+        setActiveNavItem();
+        
+        adjustLayout(sidebarInstance.currentState === 'expanded');
+        
+        sidebarInstance.initialized = true;
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSidebar);
+    } else {
+        initSidebar();
+    }
+
+    window.addEventListener('resize', () => {
+        const wasMobile = sidebarInstance.isMobile;
+        const isMobileNow = window.innerWidth <= SIDEBAR_CONFIG.BREAKPOINT;
+        
+        if (wasMobile !== isMobileNow) {
+            sidebarInstance.isMobile = isMobileNow;
+            initSidebar();
+        }
+    });
+
+    document.addEventListener('spa-navigation', setActiveNavItem);
+    window.addEventListener('popstate', setActiveNavItem);
+
+    window.sidebarAPI = {
+        refresh: populateRecommendations,
+        setActive: setActiveNavItem,
+        toggle: () => {
+            const sidebar = document.getElementById('sidebarDesktop');
+            if (sidebar) {
+                const isCollapsed = sidebar.classList.contains('collapsed');
+                if (isCollapsed) {
+                    sidebar.classList.remove('collapsed');
+                    sidebar.classList.add('expanded');
+                    adjustLayout(true);
+                } else {
+                    sidebar.classList.add('collapsed');
+                    sidebar.classList.remove('expanded');
+                    adjustLayout(false);
+                }
+            }
+        },
+        expand: () => {
+            const sidebar = document.getElementById('sidebarDesktop');
+            if (sidebar && sidebar.classList.contains('collapsed')) {
+                sidebar.classList.remove('collapsed');
+                sidebar.classList.add('expanded');
+                adjustLayout(true);
+            }
+        },
+        collapse: () => {
+            const sidebar = document.getElementById('sidebarDesktop');
+            if (sidebar && sidebar.classList.contains('expanded')) {
+                sidebar.classList.add('collapsed');
+                sidebar.classList.remove('expanded');
+                adjustLayout(false);
+            }
+        }
+    };
+})();
+</script>
+
+<!-- Script principal (tipo módulo) -->
+<script type="module" src="/main.js"></script>
 </body>
 </html>
