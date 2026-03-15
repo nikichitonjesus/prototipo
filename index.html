@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Balta Media · Conocimiento en acción</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,24 +14,71 @@
     <!-- Estilos personalizados -->
     <link rel="stylesheet" href="/styles.css">
     
-    <!-- Estilos base para la sidebar -->
+    <!-- Estilos base CORREGIDOS para ancho completo -->
     <style id="sidebar-base-styles">
-        /* Estos estilos aseguran que la sidebar siempre esté presente */
+        /* Reset de márgenes y paddings */
+        * {
+            box-sizing: border-box;
+        }
+        
         body {
             margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow-x: hidden;
             transition: margin-left 0.3s ease;
         }
         
-        /* Ajustes para los elementos sticky */
-        #main-header, #category-filters {
+        /* Header ocupa todo el ancho */
+        #main-header {
+            width: 100% !important;
+            left: 0 !important;
+            right: 0 !important;
             transition: left 0.3s ease, width 0.3s ease !important;
         }
         
-        #content {
-            transition: margin-left 0.3s ease, max-width 0.3s ease;
+        #main-header > div {
+            width: 100% !important;
+            max-width: none !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
         }
         
+        /* Barra de categorías ocupa todo el ancho */
+        #category-filters {
+            width: 100% !important;
+            left: 0 !important;
+            right: 0 !important;
+            transition: left 0.3s ease, width 0.3s ease !important;
+        }
+        
+        #category-filters > div {
+            width: 100% !important;
+            max-width: none !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+        
+        /* Contenedor principal - ANCHO COMPLETO */
+        #content {
+            width: 100% !important;
+            max-width: none !important;
+            margin-left: 0 !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+            transition: margin-left 0.3s ease;
+        }
+        
+        /* Reproductor universal */
         .player-universal {
+            transition: left 0.3s ease, width 0.3s ease !important;
+        }
+        
+        /* Cuando la sidebar está presente en desktop */
+        body.has-sidebar #main-header,
+        body.has-sidebar #category-filters,
+        body.has-sidebar #content,
+        body.has-sidebar .player-universal {
             transition: left 0.3s ease, width 0.3s ease !important;
         }
         
@@ -43,17 +90,24 @@
                 width: 100% !important;
                 max-width: 100% !important;
             }
+            
+            #main-header > div,
+            #category-filters > div,
+            #content {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
         }
     </style>
 </head>
 <body class="bg-[#050505] text-white font-[Plus_Jakarta_Sans] overflow-x-hidden">
 
-<!-- Search overlay (para móvil) - ya no se usa, pero lo dejamos por si acaso -->
+<!-- Search overlay -->
 <div class="search-overlay" id="searchOverlay"></div>
 
-<!-- Header principal (sticky) -->
+<!-- Header principal (sticky) - ANCHO COMPLETO -->
 <header id="main-header" class="sticky top-0 z-50 bg-[#050505]/80 backdrop-blur-xl border-b border-white/5 transition-opacity duration-300">
-    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between">
         <a href="/" class="flex items-center gap-2" data-link>
             <img src="https://media.baltaanay.org/web/image/885-f3d79ca9/xhbalta-aula.png" alt="Balta Media" class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg object-cover" loading="lazy">
             <span class="text-lg sm:text-xl font-bold text-white">Balta Media</span>
@@ -72,17 +126,26 @@
     </div>
 </header>
 
-<!-- Barra de categorías (sticky) -->
+<!-- Barra de categorías (sticky) - ANCHO COMPLETO -->
 <div class="sticky top-0 z-40 bg-[#050505]/95 backdrop-blur-xl border-b border-white/5" id="category-filters">
-    <div class="py-2 sm:py-3 overflow-x-auto no-scrollbar">
-        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 flex items-center gap-2 sm:gap-3" id="category-pills"></div>
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-2 sm:py-3 overflow-x-auto no-scrollbar">
+        <div class="flex items-center gap-2 sm:gap-3" id="category-pills"></div>
     </div>
 </div>
 
-<!-- Contenedor principal donde se inyectan las vistas -->
-<main id="content" class="max-w-[1600px] mx-auto px-4 sm:px-6 mt-4 min-h-screen"></main>
+<!-- ================================================ -->
+<!-- 🟢 REPRODUCTOR UNIVERSAL - PON AQUÍ TU CÓDIGO 🟢 -->
+<!-- ================================================ -->
+<!-- (Aquí va todo el HTML de tu reproductor) -->
 
-<!-- Modal de error (opcional) -->
+<!-- ================================================ -->
+
+<!-- Contenedor principal - ANCHO COMPLETO -->
+<main id="content" class="w-full px-4 sm:px-6 lg:px-8 mt-4 min-h-screen">
+    <!-- Aquí se inyecta el contenido dinámico -->
+</main>
+
+<!-- Modal de error -->
 <div id="errorModal" class="fixed inset-0 z-[10000] flex items-center justify-center hidden" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(4px);">
     <div class="bg-[#1e1e2f] rounded-2xl max-w-md w-full p-6 border border-white/10 shadow-2xl">
         <h3 class="text-xl font-bold text-white mb-3" id="errorModalTitle">Error</h3>
@@ -94,13 +157,9 @@
         </div>
     </div>
 </div>
-
-<!-- Script de la barra lateral (MEJORADO PARA SPA) -->
+<!-- Script de la barra lateral (MEJORADO) -->
 <script>
 (function() {
-    // ==========================================================================
-    // CONFIGURACIÓN
-    // ==========================================================================
     const SIDEBAR_CONFIG = {
         BREAKPOINT: 768,
         COLOR: '#0F0F0F',
@@ -109,20 +168,14 @@
         MIN_WIDTH_EXPANDED: '180px'
     };
 
-    // ==========================================================================
-    // ESTADO GLOBAL
-    // ==========================================================================
     let sidebarInstance = {
         initialized: false,
-        currentState: localStorage.getItem('sidebar_state') || 'collapsed', // 'collapsed' o 'expanded'
+        currentState: localStorage.getItem('sidebar_state') || 'collapsed',
         isMobile: window.innerWidth <= SIDEBAR_CONFIG.BREAKPOINT
     };
 
-    // ==========================================================================
-    // ESTILOS
-    // ==========================================================================
+    // ESTILOS DE LA SIDEBAR
     const sidebarStyles = `
-        /* ===== BARRA LATERAL ===== */
         .sidebar-desktop {
             position: fixed;
             top: 0;
@@ -138,24 +191,14 @@
             scrollbar-width: none;
             -ms-overflow-style: none;
         }
-        .sidebar-desktop::-webkit-scrollbar {
-            display: none;
-        }
-        .sidebar-desktop.collapsed {
-            width: ${SIDEBAR_CONFIG.WIDTH_COLLAPSED};
-        }
-        .sidebar-desktop.expanded {
-            width: ${SIDEBAR_CONFIG.WIDTH_EXPANDED};
-            min-width: ${SIDEBAR_CONFIG.MIN_WIDTH_EXPANDED};
-        }
+        .sidebar-desktop::-webkit-scrollbar { display: none; }
+        .sidebar-desktop.collapsed { width: ${SIDEBAR_CONFIG.WIDTH_COLLAPSED}; }
+        .sidebar-desktop.expanded { width: ${SIDEBAR_CONFIG.WIDTH_EXPANDED}; min-width: ${SIDEBAR_CONFIG.MIN_WIDTH_EXPANDED}; }
         
         @media (max-width: ${SIDEBAR_CONFIG.BREAKPOINT}px) {
-            .sidebar-desktop {
-                display: none !important;
-            }
+            .sidebar-desktop { display: none !important; }
         }
 
-        /* Botón toggle */
         .sidebar-toggle {
             display: flex;
             justify-content: flex-end;
@@ -164,17 +207,9 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
             margin-bottom: 20px;
         }
-        .sidebar-toggle svg {
-            width: 24px;
-            height: 24px;
-            fill: white;
-            transition: transform 0.2s;
-        }
-        .sidebar-desktop.expanded .sidebar-toggle svg {
-            transform: rotate(180deg);
-        }
+        .sidebar-toggle svg { width: 24px; height: 24px; fill: white; transition: transform 0.2s; }
+        .sidebar-desktop.expanded .sidebar-toggle svg { transform: rotate(180deg); }
 
-        /* Navegación */
         .sidebar-nav {
             display: flex;
             flex-direction: column;
@@ -193,31 +228,13 @@
             white-space: nowrap;
             transition: background 0.2s;
         }
-        .sidebar-nav-item:hover {
-            background: rgba(255,255,255,0.1);
-        }
-        .sidebar-nav-item.active {
-            background: rgba(255,255,255,0.2);
-        }
-        .sidebar-nav-item img {
-            width: 24px;
-            height: 24px;
-            filter: brightness(1.2);
-            flex-shrink: 0;
-        }
-        .sidebar-nav-item span {
-            font-size: 14px;
-            font-weight: 500;
-            transition: opacity 0.2s;
-        }
-        .sidebar-desktop.collapsed .sidebar-nav-item span {
-            display: none;
-        }
+        .sidebar-nav-item:hover { background: rgba(255,255,255,0.1); }
+        .sidebar-nav-item.active { background: rgba(255,255,255,0.2); }
+        .sidebar-nav-item img { width: 24px; height: 24px; filter: brightness(1.2); flex-shrink: 0; }
+        .sidebar-nav-item span { font-size: 14px; font-weight: 500; transition: opacity 0.2s; }
+        .sidebar-desktop.collapsed .sidebar-nav-item span { display: none; }
 
-        /* Sección de recomendados */
-        .sidebar-desktop.collapsed .sidebar-rec-section {
-            display: none;
-        }
+        .sidebar-desktop.collapsed .sidebar-rec-section { display: none; }
         .sidebar-rec-section {
             padding: 0 8px;
             margin-top: 20px;
@@ -242,67 +259,26 @@
             align-items: center;
             gap: 6px;
         }
-        .sidebar-rec-header a:hover {
-            opacity: 1;
-        }
-        .sidebar-rec-header svg {
-            width: 16px;
-            height: 16px;
-            fill: white;
-        }
-        .sidebar-rec-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+        .sidebar-rec-header a:hover { opacity: 1; }
+        .sidebar-rec-header svg { width: 16px; height: 16px; fill: white; }
+        .sidebar-rec-list { display: flex; flex-direction: column; gap: 12px; }
         .sidebar-rec-item {
             display: flex;
             align-items: center;
             gap: 10px;
             font-size: 13px;
         }
-        .sidebar-rec-item-info {
-            flex: 1;
-            min-width: 0;
-        }
-        .sidebar-rec-item-title {
-            font-weight: 500;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .sidebar-rec-item-author {
-            font-size: 11px;
-            opacity: 0.7;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+        .sidebar-rec-item-info { flex: 1; min-width: 0; }
+        .sidebar-rec-item-title { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sidebar-rec-item-author { font-size: 11px; opacity: 0.7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .sidebar-rec-play-btn {
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
+            background: none; border: none; color: white; cursor: pointer; padding: 4px 8px; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center; transition: background 0.2s;
         }
-        .sidebar-rec-play-btn:hover {
-            background: rgba(255,255,255,0.2);
-        }
-        .sidebar-rec-play-btn svg {
-            width: 18px;
-            height: 18px;
-            fill: white;
-        }
+        .sidebar-rec-play-btn:hover { background: rgba(255,255,255,0.2); }
+        .sidebar-rec-play-btn svg { width: 18px; height: 18px; fill: white; }
     `;
 
-    // ==========================================================================
-    // FUNCIONES DE UTILIDAD
-    // ==========================================================================
     function injectSidebarStyles() {
         if (document.getElementById('sidebar-desktop-styles')) return;
         const style = document.createElement('style');
@@ -312,13 +288,10 @@
     }
 
     function getRecommendations() {
-        try {
-            return window.RECOMENDADOS || [];
-        } catch (e) {
-            return [];
-        }
+        try { return window.RECOMENDADOS || []; } catch (e) { return []; }
     }
 
+    // 🟢 FUNCIÓN CORREGIDA PARA AJUSTAR LAYOUT CON ANCHO COMPLETO
     function adjustLayout(expanded) {
         if (sidebarInstance.isMobile) return;
         
@@ -326,6 +299,7 @@
         
         // Ajustar body
         document.body.style.marginLeft = width;
+        document.body.classList.add('has-sidebar');
         
         // Ajustar header
         const header = document.getElementById('main-header');
@@ -341,11 +315,13 @@
             categories.style.width = `calc(100% - ${width})`;
         }
         
-        // Ajustar contenido
+        // Ajustar contenido - AHORA OCUPA TODO EL ANCHO RESTANTE
         const content = document.getElementById('content');
         if (content) {
             content.style.marginLeft = width;
-            content.style.maxWidth = `calc(1600px - ${width})`;
+            content.style.width = `calc(100% - ${width})`;
+            // Eliminar max-width para que ocupe todo
+            content.style.maxWidth = 'none';
         }
         
         // Ajustar reproductor
@@ -355,88 +331,66 @@
             player.style.width = `calc(100% - ${width})`;
         }
         
-        // Guardar estado
         localStorage.setItem('sidebar_state', expanded ? 'expanded' : 'collapsed');
         sidebarInstance.currentState = expanded ? 'expanded' : 'collapsed';
     }
 
     function resetLayout() {
         document.body.style.marginLeft = '';
+        document.body.classList.remove('has-sidebar');
         
         const header = document.getElementById('main-header');
-        if (header) {
-            header.style.left = '';
-            header.style.width = '';
-        }
+        if (header) { header.style.left = ''; header.style.width = ''; }
         
         const categories = document.getElementById('category-filters');
-        if (categories) {
-            categories.style.left = '';
-            categories.style.width = '';
-        }
+        if (categories) { categories.style.left = ''; categories.style.width = ''; }
         
         const content = document.getElementById('content');
-        if (content) {
-            content.style.marginLeft = '';
-            content.style.maxWidth = '';
+        if (content) { 
+            content.style.marginLeft = ''; 
+            content.style.width = ''; 
+            content.style.maxWidth = ''; 
         }
         
         const player = document.querySelector('.player-universal');
-        if (player) {
-            player.style.left = '';
-            player.style.width = '';
-        }
+        if (player) { player.style.left = ''; player.style.width = ''; }
     }
 
-    // ==========================================================================
-    // RENDERIZADO DE LA SIDEBAR
-    // ==========================================================================
     function renderSidebar() {
         const sidebar = document.createElement('aside');
         sidebar.className = `sidebar-desktop ${sidebarInstance.currentState}`;
         sidebar.id = 'sidebarDesktop';
 
-        // Botón toggle
         const toggle = document.createElement('div');
         toggle.className = 'sidebar-toggle';
         toggle.id = 'sidebarDesktopToggle';
         toggle.innerHTML = '<svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>';
 
-        // Navegación
         const nav = document.createElement('div');
         nav.className = 'sidebar-nav';
         nav.innerHTML = `
             <a href="/" class="sidebar-nav-item" title="Home" data-link>
-                <img src="https://media.baltaanay.org/web/image/798-1b947c8d/Home%20%282%29.webp" alt="Home" loading="lazy">
-                <span>Home</span>
+                <img src="https://media.baltaanay.org/web/image/798-1b947c8d/Home%20%282%29.webp" alt="Home" loading="lazy"><span>Home</span>
             </a>
             <a href="/buscar" class="sidebar-nav-item" title="Explorar" data-link>
-                <img src="https://www.baltaanay.org/web/image/986-2bf9d2bb/Search%20%282%29.webp" alt="Explorar" loading="lazy">
-                <span>Explorar</span>
+                <img src="https://www.baltaanay.org/web/image/986-2bf9d2bb/Search%20%282%29.webp" alt="Explorar" loading="lazy"><span>Explorar</span>
             </a>
             <a href="/subir" class="sidebar-nav-item" title="Cargar" data-link>
-                <img src="https://www.baltaanay.org/web/image/991-1c3c204a/subir.webp" alt="Cargar" loading="lazy">
-                <span>Cargar</span>
+                <img src="https://www.baltaanay.org/web/image/991-1c3c204a/subir.webp" alt="Cargar" loading="lazy"><span>Cargar</span>
             </a>
             <a href="https://www.baltaanay.org/solicitud" class="sidebar-nav-item" title="Solicitar">
-                <img src="https://www.baltaanay.org/web/image/922-f3d79ca9/xhbalta-aula.png" alt="Solicitar" loading="lazy">
-                <span>Solicitar</span>
+                <img src="https://www.baltaanay.org/web/image/922-f3d79ca9/xhbalta-aula.png" alt="Solicitar" loading="lazy"><span>Solicitar</span>
             </a>
             <a href="/my/home" class="sidebar-nav-item" title="Usuario" data-link>
-                <img src="https://nikichitonjesus3.odoo.com/web/image/453-f4d8c1eb/user.png" alt="Usuario" loading="lazy">
-                <span>Portal</span>
+                <img src="https://nikichitonjesus3.odoo.com/web/image/453-f4d8c1eb/user.png" alt="Usuario" loading="lazy"><span>Portal</span>
             </a>
         `;
 
-        // Sección recomendados
         const recSection = document.createElement('div');
         recSection.className = 'sidebar-rec-section';
         recSection.innerHTML = `
             <div class="sidebar-rec-header">
-                <a href="/novedades" data-link>
-                    Recomendados
-                    <svg viewBox="0 0 24 24"><path d="M14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
-                </a>
+                <a href="/novedades" data-link>Recomendados<svg viewBox="0 0 24 24"><path d="M14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg></a>
             </div>
             <div class="sidebar-rec-list" id="sidebarRecList"></div>
         `;
@@ -514,7 +468,6 @@
         const toggle = document.getElementById('sidebarDesktopToggle');
         if (!sidebar || !toggle) return;
 
-        // Remover listeners anteriores
         const newToggle = toggle.cloneNode(true);
         toggle.parentNode.replaceChild(newToggle, toggle);
         
@@ -535,60 +488,37 @@
         });
     }
 
-    // ==========================================================================
-    // INICIALIZACIÓN PRINCIPAL
-    // ==========================================================================
     function initSidebar() {
-        // Actualizar estado mobile
         sidebarInstance.isMobile = window.innerWidth <= SIDEBAR_CONFIG.BREAKPOINT;
         
-        // Eliminar sidebar existente
         const oldSidebar = document.querySelector('.sidebar-desktop');
         if (oldSidebar) oldSidebar.remove();
         
-        // Si es mobile, resetear layout y salir
         if (sidebarInstance.isMobile) {
             resetLayout();
             return;
         }
         
-        // Inyectar estilos si no existen
         injectSidebarStyles();
         
-        // Renderizar sidebar
         const sidebar = renderSidebar();
         document.body.insertBefore(sidebar, document.body.firstChild);
         
-        // Poblar recomendaciones
         populateRecommendations();
-        
-        // Inicializar toggle
         initSidebarToggle();
-        
-        // Marcar item activo
         setActiveNavItem();
         
-        // Aplicar layout según estado guardado
         adjustLayout(sidebarInstance.currentState === 'expanded');
         
-        // Marcar como inicializado
         sidebarInstance.initialized = true;
-        
-        console.log('✅ Sidebar inicializada correctamente');
     }
 
-    // ==========================================================================
-    // EVENTOS Y WATCHERS
-    // ==========================================================================
-    
-    // Inicializar cuando el DOM esté listo
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initSidebar);
     } else {
         initSidebar();
     }
 
-    // Escuchar cambios de tamaño de ventana
     window.addEventListener('resize', () => {
         const wasMobile = sidebarInstance.isMobile;
         const isMobileNow = window.innerWidth <= SIDEBAR_CONFIG.BREAKPOINT;
@@ -599,11 +529,9 @@
         }
     });
 
-    // Escuchar navegación SPA para actualizar item activo
     document.addEventListener('spa-navigation', setActiveNavItem);
     window.addEventListener('popstate', setActiveNavItem);
 
-    // Exponer API pública
     window.sidebarAPI = {
         refresh: populateRecommendations,
         setActive: setActiveNavItem,
@@ -642,11 +570,10 @@
 })();
 </script>
 
-<!-- Script principal (tipo módulo) -->
+<!-- Script principal -->
 <script type="module" src="/main.js"></script>
 </body>
-    </html>
-
+</html>
 
 <!DOCTYPE html>
 <html lang="es">
