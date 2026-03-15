@@ -730,26 +730,46 @@ window.goToDetail = function(url) {
 };
 
 // Renderizar categorías en el header
+// ==========================================================================
+// RENDERIZADO DE CATEGORÍAS (CORREGIDO PARA SPA)
+// ==========================================================================
 export function renderCategoryPills(activeCat = 'Todos') {
     const container = document.getElementById('category-pills');
     if (!container) return;
+    
     container.innerHTML = '';
+    
     CATEGORIES.forEach(cat => {
         const isActive = cat === activeCat;
         const btn = document.createElement('button');
         btn.className = `whitespace-nowrap px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs font-bold transition-all ${isActive ? 'bg-white text-black' : 'bg-white/10 text-gray-300 hover:bg-white/20'}`;
         btn.innerText = cat;
-        btn.onclick = () => {
+        
+        // 🟢 CORREGIDO: Usar navegación SPA en lugar de window.location.href
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            let url;
             if (cat === 'Todos') {
-                window.location.href = '/';
+                url = '/';
             } else {
-                window.location.href = `/categoria/${encodeURIComponent(cat)}`;
+                url = `/categoria/${encodeURIComponent(cat)}`;
             }
-        };
+            
+            // Usar el sistema de navegación SPA
+            window.history.pushState(null, null, url);
+            
+            // Disparar el evento popstate para que el router procese la nueva URL
+            window.dispatchEvent(new PopStateEvent('popstate'));
+            
+            // Scroll suave al inicio
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        
         container.appendChild(btn);
     });
 }
-
 // Inicializar categorías al cargar
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => renderCategoryPills());
