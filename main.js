@@ -1,4 +1,4 @@
-// main.js - Router principal con soporte completo para búsqueda e integración con sidebar
+// main.js - Router principal con soporte completo para búsqueda e integración con sidebar y reproductor
 import { DATA, renderFeed, renderGrid, renderEpisodio, renderSerie, renderCategoryPills } from './show.js';
 import { getEpisodioByDetailUrl, getSerieByUrl, getAllEpisodios } from './episodios.js';
 import './player.js';
@@ -124,19 +124,24 @@ async function router() {
         // Disparar evento para que la sidebar actualice el item activo
         document.dispatchEvent(new Event('spa-navigation'));
 
-        // Actualizar recomendados de la sidebar si es necesario
+        // Actualizar sidebar
         if (window.sidebarAPI) {
-            // En la página principal o novedades, refrescar recomendados
             if (path === '/' || path === '/novedades') {
                 window.sidebarAPI.refresh();
             }
-            // Asegurar que el item activo esté marcado
             window.sidebarAPI.setActive();
+        }
+
+        // 🟢 NUEVO: Asegurar que el reproductor esté visible
+        if (window.updatePlayerVisibility) {
+            // Pequeño retraso para asegurar que el DOM se actualizó
+            setTimeout(() => {
+                window.updatePlayerVisibility();
+            }, 50);
         }
 
     } catch (error) {
         console.error('Error en router:', error);
-        // Mostrar error al usuario
         container.innerHTML = `
             <div class="flex flex-col items-center justify-center min-h-[50vh] text-center px-4">
                 <span class="text-6xl mb-4">😵</span>
@@ -167,7 +172,7 @@ document.addEventListener('click', e => {
     }
 });
 
-// Botones de cerrar búsqueda (si existen)
+// Botones de cerrar búsqueda
 document.addEventListener('click', e => {
     if (e.target.closest('#closeGridBtn')) {
         e.preventDefault();
@@ -179,14 +184,13 @@ document.addEventListener('click', e => {
 // Manejar navegación con botones atrás/adelante
 window.addEventListener('popstate', router);
 
-// Scroll header (mejorado)
+// Scroll header
 window.addEventListener('scroll', () => {
     const st = window.pageYOffset || document.documentElement.scrollTop;
     const topHeader = document.getElementById('main-header');
     const categoryFilters = document.getElementById('category-filters');
     if (!topHeader || !categoryFilters) return;
 
-    // No ocultar en móvil si la sidebar está presente? Mejor mantener consistente
     if (st > lastScrollTop && st > 100) {
         topHeader.style.opacity = '0';
         topHeader.style.pointerEvents = 'none';
@@ -197,43 +201,31 @@ window.addEventListener('scroll', () => {
     lastScrollTop = st <= 0 ? 0 : st;
 });
 
-// Función para recargar la página actual (útil para desarrollo)
-window.refreshPage = () => {
-    router();
-};
-
-// Exponer DATA globalmente para debugging (opcional)
-window.DATA = DATA;
-
-// Inicializar el router
-router();
-
-// También escuchar cuando los módulos se cargan dinámicamente
-// Esto ayuda a la sidebar a mantenerse actualizada
+// Override pushState para eventos adicionales
 const originalPushState = history.pushState;
 history.pushState = function() {
     originalPushState.apply(this, arguments);
-    // Disparar evento después de pushState
     setTimeout(() => {
         document.dispatchEvent(new Event('spa-navigation'));
     }, 100);
 };
 
-// Escuchar cambios en el DOM por si algún módulo modifica el contenido
+// Observer para cambios en el DOM
 const observer = new MutationObserver((mutations) => {
-    // Solo actualizar si cambió el contenido principal
     const contentChanged = mutations.some(m => 
         m.target.id === 'content' || 
         (m.target.id === 'grid-view' || m.target.id === 'feed-view')
     );
     
-    if (contentChanged && window.sidebarAPI) {
-        // Actualizar item activo en sidebar después de cambios en el DOM
-        window.sidebarAPI.setActive();
+    if (contentChanged) {
+        if (window.sidebarAPI) window.sidebarAPI.setActive();
+        // 🟢 NUEVO: Actualizar reproductor si cambia el contenido
+        if (window.updatePlayerVisibility) {
+            window.updatePlayerVisibility();
+        }
     }
 });
 
-// Observar cambios en el contenido
 const content = document.getElementById('content');
 if (content) {
     observer.observe(content, { 
@@ -243,17 +235,7 @@ if (content) {
     });
 }
 
-// Detectar cuando el reproductor está presente para ajustar layout
-document.addEventListener('player-mounted', () => {
-    if (window.sidebarAPI) {
-        // Re-aplicar layout de sidebar cuando se monta el reproductor
-        const sidebar = document.getElementById('sidebarDesktop');
-        if (sidebar) {
-            const isExpanded = sidebar.classList.contains('expanded');
-            // Forzar reajuste
-            window.dispatchEvent(new Event('resize'));
-        }
-    }
-});
+// Inicializar
+router();
 
-console.log('✅ Main.js cargado correctamente con soporte para sidebar');
+console.log('✅ Main.js cargado correctamente con soporte para sidebar y reproductor persistente');
