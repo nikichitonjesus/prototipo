@@ -421,4 +421,13 @@
         width: 40px !important;
         height: 40px !important;
     }
+    img, video, iframe, object, embed, svg {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Para evitar que elementos con width: 100vw desborden */
+body * {
+    max-width: 100vw; /* pero esto puede limitar cosas como carruseles que necesitan ser más anchos que el viewport */
+}
 }
