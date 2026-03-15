@@ -1,4 +1,5 @@
 // show.js - Vistas del feed, episodio, serie, etc. - VERSIÓN PROFESIONALIZADA MEJORADA
+// CON AJUSTES PARA EVITAR DESBORDAMIENTO
 
 import { getAllEpisodios, getSerieById, getEpisodiosBySerieId, getEpisodiosConSerie } from './episodios.js';
 import { userStorage } from './storage.js';
@@ -284,7 +285,7 @@ export function renderEpisodio(container, episodioId) {
     const addIcon = inPlaylist ? ICONS.added : ICONS.add;
 
     const html = `
-        <div class="detail-view w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="detail-view w-full px-4 sm:px-6 lg:px-8 py-6">
             <!-- Header adaptable: mobile vs desktop -->
             <div class="episode-header mb-8">
                 <!-- Versión móvil (stack vertical) -->
@@ -414,7 +415,7 @@ export function renderSerie(container, serieUrl) {
     const ultimoEpisodio = episodiosSerie[0] || null;
 
     const html = `
-        <div class="detail-view w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="detail-view w-full px-4 sm:px-6 lg:px-8 py-6">
             <!-- Header adaptable: mobile vs desktop -->
             <div class="serie-header mb-8">
                 <!-- Versión móvil (stack vertical) -->
@@ -730,9 +731,6 @@ window.goToDetail = function(url) {
 };
 
 // Renderizar categorías en el header
-// ==========================================================================
-// RENDERIZADO DE CATEGORÍAS (CORREGIDO PARA SPA)
-// ==========================================================================
 export function renderCategoryPills(activeCat = 'Todos') {
     const container = document.getElementById('category-pills');
     if (!container) return;
@@ -745,7 +743,6 @@ export function renderCategoryPills(activeCat = 'Todos') {
         btn.className = `whitespace-nowrap px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs font-bold transition-all ${isActive ? 'bg-white text-black' : 'bg-white/10 text-gray-300 hover:bg-white/20'}`;
         btn.innerText = cat;
         
-        // 🟢 CORREGIDO: Usar navegación SPA en lugar de window.location.href
         btn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -757,19 +754,15 @@ export function renderCategoryPills(activeCat = 'Todos') {
                 url = `/categoria/${encodeURIComponent(cat)}`;
             }
             
-            // Usar el sistema de navegación SPA
             window.history.pushState(null, null, url);
-            
-            // Disparar el evento popstate para que el router procese la nueva URL
             window.dispatchEvent(new PopStateEvent('popstate'));
-            
-            // Scroll suave al inicio
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
         
         container.appendChild(btn);
     });
 }
+
 // Inicializar categorías al cargar
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => renderCategoryPills());
