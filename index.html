@@ -14,7 +14,7 @@
     <!-- Estilos personalizados -->
     <link rel="stylesheet" href="/styles.css">
     
-    <!-- ESTILOS BASE - SIN LÍMITES ARTIFICIALES -->
+    <!-- ESTILOS BASE - CON CSS GRID PARA LAYOUT PERFECTO -->
     <style id="sidebar-base-styles">
         /* Reset */
         * {
@@ -30,78 +30,37 @@
         
         body {
             min-height: 100vh;
-            transition: margin-left 0.3s ease;
             background: #050505;
+            display: grid;
+            grid-template-columns: auto 1fr; /* Sidebar automática, resto 1fr */
+            grid-template-rows: auto auto 1fr; /* Header, categorías, contenido */
+            grid-template-areas: 
+                "sidebar header"
+                "sidebar categories"
+                "sidebar content";
         }
         
-        /* HEADER - OCUPA TODO EL ESPACIO DISPONIBLE */
-        #main-header {
-            position: sticky;
-            top: 0;
-            width: 100% !important;
-            left: 0 !important;
-            transition: left 0.3s ease, width 0.3s ease !important;
-            z-index: 50;
-            background: rgba(5,5,5,0.8);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        
-        #main-header > div {
-            width: 100%;
-            padding: 0.75rem 1rem;
-        }
-        
-        /* BARRA DE CATEGORÍAS - OCUPA TODO EL ESPACIO DISPONIBLE */
-        #category-filters {
-            position: sticky;
-            top: 0;
-            width: 100% !important;
-            left: 0 !important;
-            transition: left 0.3s ease, width 0.3s ease !important;
-            z-index: 40;
-            background: rgba(5,5,5,0.95);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        
-        #category-filters > div {
-            width: 100%;
-            padding: 0.5rem 1rem;
-        }
-        
-        /* CONTENEDOR PRINCIPAL - SIN LÍMITES, 100% DEL ESPACIO DISPONIBLE */
-        #content {
-            width: 100% !important;
-            padding: 1rem 1rem !important;
-            margin-left: 0 !important;
-            transition: margin-left 0.3s ease;
-            min-height: 100vh;
-        }
-        
-        /* REPRODUCTOR */
-        .player-universal {
-            transition: left 0.3s ease, width 0.3s ease !important;
-        }
-        
-        /* ESTILOS SIDEBAR */
+        /* SIDEBAR */
         .sidebar-desktop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
+            grid-area: sidebar;
             background: #0F0F0F;
             color: #fff;
             z-index: 900;
-            transition: width 0.3s ease;
             overflow-x: hidden;
             overflow-y: auto;
             box-shadow: 2px 0 5px rgba(0,0,0,0.5);
             scrollbar-width: none;
+            transition: width 0.3s ease;
+            width: 70px; /* Colapsado por defecto */
+            min-width: 70px;
         }
+        
+        .sidebar-desktop.expanded {
+            width: 15%;
+            min-width: 180px;
+        }
+        
         .sidebar-desktop::-webkit-scrollbar { display: none; }
-        .sidebar-desktop.collapsed { width: 70px; }
-        .sidebar-desktop.expanded { width: 15%; min-width: 180px; }
         
         @media (max-width: 768px) {
             .sidebar-desktop { display: none !important; }
@@ -184,11 +143,64 @@
         }
         .sidebar-rec-play-btn:hover { background: rgba(255,255,255,0.2); }
         .sidebar-rec-play-btn svg { width: 18px; height: 18px; fill: white; }
+
+        /* HEADER */
+        #main-header {
+            grid-area: header;
+            position: sticky;
+            top: 0;
+            background: rgba(5,5,5,0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            z-index: 50;
+        }
+        
+        #main-header > div {
+            padding: 0.75rem 1rem;
+        }
+
+        /* BARRA DE CATEGORÍAS */
+        #category-filters {
+            grid-area: categories;
+            position: sticky;
+            top: 0;
+            background: rgba(5,5,5,0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            z-index: 40;
+        }
+        
+        #category-filters > div {
+            padding: 0.5rem 1rem;
+        }
+
+        /* CONTENEDOR PRINCIPAL */
+        #content {
+            grid-area: content;
+            padding: 1rem 1rem;
+            min-height: 100vh;
+        }
+
+        /* REPRODUCTOR (si se inserta dentro del contenido, se adaptará automáticamente) */
+        .player-universal {
+            /* Si es fijo y debe estar sobre el contenido, se manejará aparte */
+        }
+
+        /* En móviles, una sola columna */
+        @media (max-width: 768px) {
+            body {
+                grid-template-columns: 1fr;
+                grid-template-areas: 
+                    "header"
+                    "categories"
+                    "content";
+            }
+        }
     </style>
 </head>
 <body class="bg-[#050505] text-white font-[Plus_Jakarta_Sans]">
 
-<!-- Header principal - SIN LÍMITES -->
+<!-- Header principal -->
 <header id="main-header">
     <div class="flex items-center justify-between">
         <a href="/" class="flex items-center gap-2" data-link>
@@ -208,7 +220,7 @@
     </div>
 </header>
 
-<!-- Barra de categorías - SIN LÍMITES -->
+<!-- Barra de categorías -->
 <div id="category-filters">
     <div class="overflow-x-auto no-scrollbar">
         <div class="flex items-center gap-2 sm:gap-3" id="category-pills"></div>
@@ -239,21 +251,11 @@
     </div>
 </div>
 
-<!-- Botón flotante móvil -->
-<button id="openPlayerBtn" onclick="window.togglePlayer ? window.togglePlayer() : window.updatePlayerVisibility?.(true)" 
-        class="fixed bottom-20 right-4 z-[1002] bg-[#7b2eda] rounded-full p-3 shadow-lg flex items-center gap-2 lg:hidden">
-    <img src="https://nikichitonjes-home.odoo.com/web/image/478-0e3df8d3/reanudar.gif" alt="Reproductor" class="w-6 h-6">
-    <span class="text-sm font-bold">Escuchar</span>
-</button>
-
-<!-- Script de la barra lateral -->
+<!-- Script de la barra lateral (simplificado, sin ajustes de layout manual) -->
 <script>
 (function() {
     const SIDEBAR_CONFIG = {
         BREAKPOINT: 768,
-        WIDTH_EXPANDED: '15%',
-        WIDTH_COLLAPSED: '70px',
-        MIN_WIDTH_EXPANDED: '180px'
     };
 
     let sidebarInstance = {
@@ -261,76 +263,6 @@
         currentState: localStorage.getItem('sidebar_state') || 'collapsed',
         isMobile: window.innerWidth <= SIDEBAR_CONFIG.BREAKPOINT
     };
-
-    // ==========================================================================
-    // FUNCIÓN CRÍTICA - AJUSTE PERFECTO DEL LAYOUT
-    // ==========================================================================
-    function adjustLayout(expanded) {
-        if (sidebarInstance.isMobile) return;
-        
-        // Calcular ancho exacto de la sidebar
-        let sidebarWidth;
-        if (expanded) {
-            sidebarWidth = Math.max(
-                parseFloat(SIDEBAR_CONFIG.MIN_WIDTH_EXPANDED),
-                window.innerWidth * 0.15
-            );
-        } else {
-            sidebarWidth = 70;
-        }
-        
-        // Aplicar margin-left al body (esto empuja todo el contenido)
-        document.body.style.marginLeft = sidebarWidth + 'px';
-        document.body.classList.add('has-sidebar');
-        
-        // HEADER - Ocupa desde la sidebar hasta el borde derecho
-        const header = document.getElementById('main-header');
-        if (header) {
-            header.style.left = sidebarWidth + 'px';
-            header.style.width = `calc(100% - ${sidebarWidth}px)`;
-        }
-        
-        // CATEGORÍAS - Ocupa desde la sidebar hasta el borde derecho
-        const categories = document.getElementById('category-filters');
-        if (categories) {
-            categories.style.left = sidebarWidth + 'px';
-            categories.style.width = `calc(100% - ${sidebarWidth}px)`;
-        }
-        
-        // CONTENEDOR - Ocupa el 100% del espacio disponible desde la sidebar
-        const content = document.getElementById('content');
-        if (content) {
-            content.style.marginLeft = '0'; // Ya lo controla el body
-            content.style.width = '100%'; // 100% del espacio asignado por body
-        }
-        
-        // REPRODUCTOR
-        const player = document.querySelector('.player-universal');
-        if (player) {
-            player.style.left = sidebarWidth + 'px';
-            player.style.width = `calc(100% - ${sidebarWidth}px)`;
-        }
-        
-        localStorage.setItem('sidebar_state', expanded ? 'expanded' : 'collapsed');
-        sidebarInstance.currentState = expanded ? 'expanded' : 'collapsed';
-    }
-
-    function resetLayout() {
-        document.body.style.marginLeft = '';
-        document.body.classList.remove('has-sidebar');
-        
-        const header = document.getElementById('main-header');
-        if (header) { header.style.left = ''; header.style.width = ''; }
-        
-        const categories = document.getElementById('category-filters');
-        if (categories) { categories.style.left = ''; categories.style.width = ''; }
-        
-        const content = document.getElementById('content');
-        if (content) { content.style.marginLeft = ''; content.style.width = ''; }
-        
-        const player = document.querySelector('.player-universal');
-        if (player) { player.style.left = ''; player.style.width = ''; }
-    }
 
     function getRecommendations() {
         try { return window.RECOMENDADOS || []; } catch (e) { return []; }
@@ -459,12 +391,11 @@
             if (isCollapsed) {
                 sidebar.classList.remove('collapsed');
                 sidebar.classList.add('expanded');
-                adjustLayout(true);
             } else {
                 sidebar.classList.add('collapsed');
                 sidebar.classList.remove('expanded');
-                adjustLayout(false);
             }
+            localStorage.setItem('sidebar_state', isCollapsed ? 'expanded' : 'collapsed');
         });
     }
 
@@ -475,8 +406,7 @@
         if (oldSidebar) oldSidebar.remove();
         
         if (sidebarInstance.isMobile) {
-            resetLayout();
-            return;
+            return; // No sidebar en móvil
         }
         
         const sidebar = renderSidebar();
@@ -485,8 +415,6 @@
         populateRecommendations();
         initSidebarToggle();
         setActiveNavItem();
-        
-        adjustLayout(sidebarInstance.currentState === 'expanded');
         
         sidebarInstance.initialized = true;
     }
@@ -504,8 +432,6 @@
         if (wasMobile !== isMobileNow) {
             sidebarInstance.isMobile = isMobileNow;
             initSidebar();
-        } else if (!sidebarInstance.isMobile) {
-            adjustLayout(sidebarInstance.currentState === 'expanded');
         }
     });
 
@@ -522,19 +448,17 @@
                 if (isCollapsed) {
                     sidebar.classList.remove('collapsed');
                     sidebar.classList.add('expanded');
-                    adjustLayout(true);
                 } else {
                     sidebar.classList.add('collapsed');
                     sidebar.classList.remove('expanded');
-                    adjustLayout(false);
                 }
+                localStorage.setItem('sidebar_state', isCollapsed ? 'expanded' : 'collapsed');
             }
         }
     };
 })();
 </script>
 
-<!-- Script principal (SIN importar player.js) -->
 <script type="module" src="/main.js"></script>
 </body>
 </html>
