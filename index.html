@@ -645,6 +645,7 @@
 <!-- Script principal (tipo módulo) -->
 <script type="module" src="/main.js"></script>
 </body>
+    </html>
 
 
 <!DOCTYPE html>
@@ -3785,9 +3786,82 @@ window.addEventListener('beforeunload', () => {
     navigator.mediaSession.metadata = null;
   }
 });
+      // ============================================
+// PARCHES PARA SPA - AÑADE ESTO AL FINAL DE TU REPRODUCTOR
+// ============================================
+
+// Guardar instancia del reproductor
+window.universalPlayer = {
+    instance: null,
+    initialized: false,
+    currentMedia: null
+};
+
+// Prevenir que el reproductor se reinicie con cada navegación
+const originalLoadState = loadState;
+loadState = function() {
+    if (!window.universalPlayer.initialized) {
+        originalLoadState();
+        window.universalPlayer.initialized = true;
+        window.universalPlayer.instance = this;
+    }
+};
+
+// Escuchar eventos de navegación SPA
+document.addEventListener('spa-navigation', () => {
+    console.log('Navegación SPA detectada - reproductor intacto');
+    
+    // Actualizar el botón #openPlayerBtn si existe
+    const openPlayerBtn = document.querySelector('#openPlayerBtn');
+    if (openPlayerBtn && currentMedia) {
+        updateOpenPlayerButton(!mediaElement.paused);
+    }
+    
+    // Asegurar que el reproductor mantenga su estado
+    if (currentMedia && playerUniversal.style.display === 'none') {
+        // Si estaba oculto pero hay media, mostrarlo minimizado
+        showMinimized();
+    }
+});
+
+// Sobrescribir window.addEventListener('load', ...) para que no se ejecute múltiples veces
+const originalLoadHandler = window.onload;
+window.onload = function() {
+    if (!window.universalPlayer.initialized) {
+        if (originalLoadHandler) originalLoadHandler();
+    }
+};
+
+// Exponer función para actualizar el reproductor desde main.js
+window.updatePlayerVisibility = function(forceShow = false) {
+    if (!currentMedia) {
+        const programa = window.PROGRAMA_DEL_DIA || {
+            mediaUrl: 'https://awscdn.podcasts.com/audio-vhhlggMJNysHnLYW8KXAQwu4w.mp3',
+            mediaType: 'audio',
+            coverUrlContainer: 'https://s3.amazonaws.com/podcasts-image-uploads/el-populismo-y-la-democracia-jesus-huerta-de-soto-1400x1400.png',
+            coverUrlInfo: 'https://www.edu.balta.lat/web/image/415-8ae27244/media.png',
+            title: 'El populismo y la democracia',
+            detailUrl: '#',
+            author: "Jesús Huerta de Soto",
+            text: "No disponible",
+            allowDownload: true
+        };
+        loadMedia(programa.mediaUrl, programa.mediaType, programa.coverUrlContainer, programa.coverUrlInfo, programa.title, programa.detailUrl, programa.author, [], programa.text, programa.allowDownload);
+    }
+    
+    if (forceShow) {
+        showExpanded();
+    } else {
+        showMinimized();
+    }
+};
+
+// Inicializar si no está ya hecho
+if (!window.universalPlayer.initialized && document.readyState === 'complete') {
+    window.universalPlayer.initialized = true;
+    loadState();
+}
 </script>
 
 </body>
-</html>
-
 </html>
