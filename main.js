@@ -1,7 +1,6 @@
 // main.js - Router principal con soporte completo para búsqueda e integración con sidebar y reproductor
 import { DATA, renderFeed, renderGrid, renderEpisodio, renderSerie, renderCategoryPills } from './show.js';
 import { getEpisodioByDetailUrl, getSerieByUrl, getAllEpisodios } from './episodios.js';
-import './player.js';
 
 // Páginas especiales
 const PAGES = [
