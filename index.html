@@ -14,16 +14,16 @@
     <!-- Estilos personalizados -->
     <link rel="stylesheet" href="/styles.css">
     
-    <!-- ESTILOS BASE - CON CSS GRID PARA LAYOUT PERFECTO -->
-    <style id="sidebar-base-styles">
+    <!-- ESTILOS BASE - LAYOUT PERFECTO CON GRID -->
+    <style>
         /* Reset */
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
         
         html, body {
-            margin: 0;
-            padding: 0;
             width: 100%;
             overflow-x: hidden;
         }
@@ -31,120 +31,44 @@
         body {
             min-height: 100vh;
             background: #050505;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: white;
             display: grid;
-            grid-template-columns: auto 1fr; /* Sidebar automática, resto 1fr */
-            grid-template-rows: auto auto 1fr; /* Header, categorías, contenido */
+            grid-template-columns: auto 1fr; /* Sidebar automática, contenido 1fr */
+            grid-template-rows: auto auto 1fr; /* Header, categorías, main */
             grid-template-areas: 
                 "sidebar header"
                 "sidebar categories"
                 "sidebar content";
         }
-        
-        /* SIDEBAR */
+
+        /* Sidebar */
         .sidebar-desktop {
             grid-area: sidebar;
             background: #0F0F0F;
             color: #fff;
             z-index: 900;
-            overflow-x: hidden;
             overflow-y: auto;
+            overflow-x: hidden;
             box-shadow: 2px 0 5px rgba(0,0,0,0.5);
-            scrollbar-width: none;
             transition: width 0.3s ease;
-            width: 70px; /* Colapsado por defecto */
+            width: 70px; /* Colapsado */
             min-width: 70px;
         }
-        
         .sidebar-desktop.expanded {
             width: 15%;
             min-width: 180px;
         }
-        
-        .sidebar-desktop::-webkit-scrollbar { display: none; }
-        
+        .sidebar-desktop::-webkit-scrollbar {
+            display: none;
+        }
         @media (max-width: 768px) {
-            .sidebar-desktop { display: none !important; }
+            .sidebar-desktop {
+                display: none !important;
+            }
         }
 
-        .sidebar-toggle {
-            display: flex;
-            justify-content: flex-end;
-            padding: 16px 12px;
-            cursor: pointer;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 20px;
-        }
-        .sidebar-toggle svg { width: 24px; height: 24px; fill: white; transition: transform 0.2s; }
-        .sidebar-desktop.expanded .sidebar-toggle svg { transform: rotate(180deg); }
-
-        .sidebar-nav {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            padding: 0 8px;
-            margin-bottom: 30px;
-        }
-        .sidebar-nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: white;
-            text-decoration: none;
-            padding: 10px;
-            border-radius: 8px;
-            white-space: nowrap;
-            transition: background 0.2s;
-        }
-        .sidebar-nav-item:hover { background: rgba(255,255,255,0.1); }
-        .sidebar-nav-item.active { background: rgba(255,255,255,0.2); }
-        .sidebar-nav-item img { width: 24px; height: 24px; filter: brightness(1.2); flex-shrink: 0; }
-        .sidebar-nav-item span { font-size: 14px; font-weight: 500; }
-        .sidebar-desktop.collapsed .sidebar-nav-item span { display: none; }
-
-        .sidebar-desktop.collapsed .sidebar-rec-section { display: none; }
-        .sidebar-rec-section {
-            padding: 0 8px;
-            margin-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 16px;
-        }
-        .sidebar-rec-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-        .sidebar-rec-header a {
-            color: white;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            opacity: 0.9;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .sidebar-rec-header svg { width: 16px; height: 16px; fill: white; }
-        .sidebar-rec-list { display: flex; flex-direction: column; gap: 12px; }
-        .sidebar-rec-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13px;
-        }
-        .sidebar-rec-item-info { flex: 1; min-width: 0; }
-        .sidebar-rec-item-title { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .sidebar-rec-item-author { font-size: 11px; opacity: 0.7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .sidebar-rec-play-btn {
-            background: none; border: none; color: white; cursor: pointer; padding: 4px 8px; border-radius: 4px;
-            display: flex; align-items: center; justify-content: center; transition: background 0.2s;
-        }
-        .sidebar-rec-play-btn:hover { background: rgba(255,255,255,0.2); }
-        .sidebar-rec-play-btn svg { width: 18px; height: 18px; fill: white; }
-
-        /* HEADER */
+        /* Header */
         #main-header {
             grid-area: header;
             position: sticky;
@@ -153,13 +77,13 @@
             backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255,255,255,0.05);
             z-index: 50;
+            width: 100%; /* Ocupa todo el ancho de su celda */
         }
-        
         #main-header > div {
             padding: 0.75rem 1rem;
         }
 
-        /* BARRA DE CATEGORÍAS */
+        /* Barra de categorías */
         #category-filters {
             grid-area: categories;
             position: sticky;
@@ -168,22 +92,18 @@
             backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255,255,255,0.05);
             z-index: 40;
+            width: 100%;
         }
-        
         #category-filters > div {
             padding: 0.5rem 1rem;
         }
 
-        /* CONTENEDOR PRINCIPAL */
+        /* Contenido principal */
         #content {
             grid-area: content;
-            padding: 1rem 1rem;
+            width: 100%; /* Ocupa todo el ancho de su celda */
             min-height: 100vh;
-        }
-
-        /* REPRODUCTOR (si se inserta dentro del contenido, se adaptará automáticamente) */
-        .player-universal {
-            /* Si es fijo y debe estar sobre el contenido, se manejará aparte */
+            /* El padding se lo dan los hijos, no este contenedor */
         }
 
         /* En móviles, una sola columna */
@@ -196,9 +116,23 @@
                     "content";
             }
         }
+
+        /* Estilos para los carruseles (se mantienen, pero ajustamos el padding) */
+        .carousel-scroll {
+            padding-left: 1rem;
+            padding-right: 1rem;
+            scroll-padding-left: 1rem;
+            scroll-padding-right: 1rem;
+        }
+
+        /* Para que los elementos dentro de #content tengan padding si es necesario */
+        .content-padded {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
     </style>
 </head>
-<body class="bg-[#050505] text-white font-[Plus_Jakarta_Sans]">
+<body>
 
 <!-- Header principal -->
 <header id="main-header">
@@ -207,7 +141,6 @@
             <img src="https://media.baltaanay.org/web/image/885-f3d79ca9/xhbalta-aula.png" alt="Balta Media" class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg object-cover" loading="lazy">
             <span class="text-lg sm:text-xl font-bold text-white">Balta Media</span>
         </a>
-
         <div class="flex items-center gap-3 sm:gap-4">
             <a href="/novedades" class="relative text-gray-400 hover:text-white" data-link>
                 <img src="https://media.baltaanay.org/web/image/796-aee658de/Explore.png" alt="Novedades" class="w-5 h-5" loading="lazy">
@@ -227,18 +160,12 @@
     </div>
 </div>
 
-<!-- ================================================ -->
-<!-- 🟢 REPRODUCTOR UNIVERSAL - PEGA AQUÍ TU CÓDIGO 🟢 -->
-<!-- ================================================ -->
-
-<!-- ================================================ -->
-
-<!-- Contenedor principal - SIN LÍMITES -->
+<!-- Contenedor principal -->
 <main id="content">
     <!-- Aquí se inyecta el contenido dinámico -->
 </main>
 
-<!-- Modal de error -->
+<!-- Modal de error (sin cambios) -->
 <div id="errorModal" class="fixed inset-0 z-[10000] flex items-center justify-center hidden" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(4px);">
     <div class="bg-[#1e1e2f] rounded-2xl max-w-md w-full p-6 border border-white/10 shadow-2xl">
         <h3 class="text-xl font-bold text-white mb-3" id="errorModalTitle">Error</h3>
@@ -250,16 +177,11 @@
         </div>
     </div>
 </div>
-
 <!-- Script de la barra lateral (simplificado, sin ajustes de layout manual) -->
 <script>
 (function() {
-    const SIDEBAR_CONFIG = {
-        BREAKPOINT: 768,
-    };
-
+    const SIDEBAR_CONFIG = { BREAKPOINT: 768 };
     let sidebarInstance = {
-        initialized: false,
         currentState: localStorage.getItem('sidebar_state') || 'collapsed',
         isMobile: window.innerWidth <= SIDEBAR_CONFIG.BREAKPOINT
     };
@@ -316,14 +238,11 @@
     function populateRecommendations() {
         const container = document.getElementById('sidebarRecList');
         if (!container) return;
-
         const episodes = getRecommendations();
-
         if (!episodes.length) {
             container.innerHTML = '<div style="color:#aaa; padding:8px;">No hay recomendados</div>';
             return;
         }
-
         container.innerHTML = '';
         episodes.forEach(ep => {
             const title = ep.title || 'Sin título';
@@ -339,7 +258,6 @@
                     <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                 </button>
             `;
-            
             const btn = item.querySelector('.sidebar-rec-play-btn');
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -379,14 +297,11 @@
         const sidebar = document.getElementById('sidebarDesktop');
         const toggle = document.getElementById('sidebarDesktopToggle');
         if (!sidebar || !toggle) return;
-
         const newToggle = toggle.cloneNode(true);
         toggle.parentNode.replaceChild(newToggle, toggle);
-        
         newToggle.addEventListener('click', (e) => {
             e.stopPropagation();
             e.preventDefault();
-            
             const isCollapsed = sidebar.classList.contains('collapsed');
             if (isCollapsed) {
                 sidebar.classList.remove('collapsed');
@@ -401,22 +316,14 @@
 
     function initSidebar() {
         sidebarInstance.isMobile = window.innerWidth <= SIDEBAR_CONFIG.BREAKPOINT;
-        
         const oldSidebar = document.querySelector('.sidebar-desktop');
         if (oldSidebar) oldSidebar.remove();
-        
-        if (sidebarInstance.isMobile) {
-            return; // No sidebar en móvil
-        }
-        
+        if (sidebarInstance.isMobile) return;
         const sidebar = renderSidebar();
         document.body.insertBefore(sidebar, document.body.firstChild);
-        
         populateRecommendations();
         initSidebarToggle();
         setActiveNavItem();
-        
-        sidebarInstance.initialized = true;
     }
 
     if (document.readyState === 'loading') {
@@ -428,7 +335,6 @@
     window.addEventListener('resize', () => {
         const wasMobile = sidebarInstance.isMobile;
         const isMobileNow = window.innerWidth <= SIDEBAR_CONFIG.BREAKPOINT;
-        
         if (wasMobile !== isMobileNow) {
             sidebarInstance.isMobile = isMobileNow;
             initSidebar();
