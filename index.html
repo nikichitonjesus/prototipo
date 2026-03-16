@@ -13,55 +13,59 @@
     <link rel="icon" type="image/png" sizes="16x16" href="https://media.baltaanay.org/web/image/885-f3d79ca9/xhbalta-aula.png">
     <!-- Estilos personalizados -->
     <link rel="stylesheet" href="/styles.css">
-    
-    <!-- ESTILOS BASE - CON CSS GRID PARA LAYOUT PERFECTO -->
+   
+    <!-- ESTILOS BASE -->
     <style id="sidebar-base-styles">
-        /* Reset */
         * {
             box-sizing: border-box;
         }
-        
         html, body {
             margin: 0;
             padding: 0;
             width: 100%;
-            overflow-x: hidden;
-        }
-        
-        body {
-            min-height: 100vh;
+            height: 100%;
+            overflow: hidden;
             background: #050505;
-            display: grid;
-            grid-template-columns: auto 1fr; /* Sidebar automática, resto 1fr */
-            grid-template-rows: auto auto 1fr; /* Header, categorías, contenido */
-            grid-template-areas: 
-                "sidebar header"
-                "sidebar categories"
-                "sidebar content";
         }
-        
+
+        body {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            grid-template-areas: 
+                "sidebar main-area";
+            grid-template-rows: 1fr;
+        }
+
         /* SIDEBAR */
         .sidebar-desktop {
             grid-area: sidebar;
             background: #0F0F0F;
             color: #fff;
             z-index: 900;
+            position: sticky;
+            top: 0;
+            height: 100vh;
             overflow-x: hidden;
             overflow-y: auto;
             box-shadow: 2px 0 5px rgba(0,0,0,0.5);
             scrollbar-width: none;
             transition: width 0.3s ease;
-            width: 70px; /* Colapsado por defecto */
+            width: 70px;
             min-width: 70px;
         }
-        
-        .sidebar-desktop.expanded {
-            width: 15%;
-            min-width: 180px;
-        }
-        
         .sidebar-desktop::-webkit-scrollbar { display: none; }
-        
+
+        .sidebar-desktop.expanded {
+            width: 220px;
+            min-width: 220px;
+        }
+        @media (min-width: 1280px) {
+            .sidebar-desktop.expanded {
+                width: 250px;
+                min-width: 250px;
+            }
+        }
+
         @media (max-width: 768px) {
             .sidebar-desktop { display: none !important; }
         }
@@ -99,9 +103,9 @@
         .sidebar-nav-item.active { background: rgba(255,255,255,0.2); }
         .sidebar-nav-item img { width: 24px; height: 24px; filter: brightness(1.2); flex-shrink: 0; }
         .sidebar-nav-item span { font-size: 14px; font-weight: 500; }
-        .sidebar-desktop.collapsed .sidebar-nav-item span { display: none; }
+        .sidebar-desktop:not(.expanded) .sidebar-nav-item span { display: none; }
+        .sidebar-desktop:not(.expanded) .sidebar-rec-section { display: none; }
 
-        .sidebar-desktop.collapsed .sidebar-rec-section { display: none; }
         .sidebar-rec-section {
             padding: 0 8px;
             margin-top: 20px;
@@ -128,115 +132,150 @@
         }
         .sidebar-rec-header svg { width: 16px; height: 16px; fill: white; }
         .sidebar-rec-list { display: flex; flex-direction: column; gap: 12px; }
+
         .sidebar-rec-item {
             display: flex;
             align-items: center;
             gap: 10px;
             font-size: 13px;
+            cursor: pointer;
+            transition: background 0.15s;
+            padding: 6px;
+            border-radius: 6px;
+        }
+        .sidebar-rec-item:hover { background: rgba(255,255,255,0.08); }
+        .sidebar-rec-item img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 6px;
+            flex-shrink: 0;
         }
         .sidebar-rec-item-info { flex: 1; min-width: 0; }
         .sidebar-rec-item-title { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .sidebar-rec-item-author { font-size: 11px; opacity: 0.7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
         .sidebar-rec-play-btn {
-            background: none; border: none; color: white; cursor: pointer; padding: 4px 8px; border-radius: 4px;
-            display: flex; align-items: center; justify-content: center; transition: background 0.2s;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
         }
         .sidebar-rec-play-btn:hover { background: rgba(255,255,255,0.2); }
         .sidebar-rec-play-btn svg { width: 18px; height: 18px; fill: white; }
 
-        /* HEADER */
-        #main-header {
-            grid-area: header;
+        /* MAIN AREA */
+        .main-area {
+            grid-area: main-area;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* HEADER Y FILTROS - COMPORTAMIENTO CORREGIDO */
+        .header-container {
             position: sticky;
             top: 0;
-            background: rgba(5,5,5,0.8);
+            z-index: 60;
+            width: 100%;
+            transition: transform 0.32s cubic-bezier(0.25, 0.1, 0.25, 1);
+            background: rgba(5,5,5,0.96);
             backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            z-index: 50;
         }
-        
+
+        .header-container.hidden {
+            transform: translateY(-100%);
+        }
+
+        #main-header {
+            background: transparent;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+
         #main-header > div {
             padding: 0.75rem 1rem;
         }
 
-        /* BARRA DE CATEGORÍAS */
         #category-filters {
-            grid-area: categories;
-            position: sticky;
-            top: 0;
-            background: rgba(5,5,5,0.95);
+            background: rgba(5,5,5,0.96);
             backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            z-index: 40;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            flex-shrink: 0;
         }
-        
+
         #category-filters > div {
             padding: 0.5rem 1rem;
         }
 
-        /* CONTENEDOR PRINCIPAL */
         #content {
-            grid-area: content;
-            padding: 1rem 1rem;
-            min-height: 100vh;
+            flex: 1 1 auto;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 1.25rem 1rem;
         }
 
-        /* REPRODUCTOR (si se inserta dentro del contenido, se adaptará automáticamente) */
-        .player-universal {
-            /* Si es fijo y debe estar sobre el contenido, se manejará aparte */
-        }
-
-        /* En móviles, una sola columna */
         @media (max-width: 768px) {
             body {
                 grid-template-columns: 1fr;
-                grid-template-areas: 
-                    "header"
-                    "categories"
-                    "content";
+                grid-template-areas: "main-area";
             }
         }
     </style>
 </head>
 <body class="bg-[#050505] text-white font-[Plus_Jakarta_Sans]">
 
-<!-- Header principal -->
-<header id="main-header">
-    <div class="flex items-center justify-between">
-        <a href="/" class="flex items-center gap-2" data-link>
-            <img src="https://media.baltaanay.org/web/image/885-f3d79ca9/xhbalta-aula.png" alt="Balta Media" class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg object-cover" loading="lazy">
-            <span class="text-lg sm:text-xl font-bold text-white">Balta Media</span>
-        </a>
+<!-- Sidebar -->
+<aside class="sidebar-desktop collapsed" id="sidebarDesktop"></aside>
 
-        <div class="flex items-center gap-3 sm:gap-4">
-            <a href="/novedades" class="relative text-gray-400 hover:text-white" data-link>
-                <img src="https://media.baltaanay.org/web/image/796-aee658de/Explore.png" alt="Novedades" class="w-5 h-5" loading="lazy">
-                <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-            </a>
-            <a href="/my/home" class="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full overflow-hidden" data-link>
-                <img src="https://media.baltaanay.org/web/image/793-902e5b33/Search%20%282%29.png" alt="Usuario" class="w-full h-full object-cover" loading="lazy">
-            </a>
+<!-- Área principal -->
+<div class="main-area">
+
+    <!-- Header + Filtros - Contenedor unificado para sticky -->
+    <div class="header-container" id="headerContainer">
+        <!-- Header -->
+        <header id="main-header">
+            <div class="flex items-center justify-between">
+                <a href="/" class="flex items-center gap-2" data-link>
+                    <img src="https://media.baltaanay.org/web/image/885-f3d79ca9/xhbalta-aula.png" alt="Balta Media" class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg object-cover" loading="lazy">
+                    <span class="text-lg sm:text-xl font-bold text-white">Balta Media</span>
+                </a>
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <a href="/novedades" class="relative text-gray-400 hover:text-white" data-link>
+                        <img src="https://media.baltaanay.org/web/image/796-aee658de/Explore.png" alt="Novedades" class="w-5 h-5" loading="lazy">
+                        <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                    </a>
+                    <a href="/my/home" class="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full overflow-hidden" data-link>
+                        <img src="https://media.baltaanay.org/web/image/793-902e5b33/Search%20%282%29.png" alt="Usuario" class="w-full h-full object-cover" loading="lazy">
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Filtros / categorías -->
+        <div id="category-filters">
+            <div class="overflow-x-auto no-scrollbar">
+                <div class="flex items-center gap-2 sm:gap-3" id="category-pills"></div>
+            </div>
         </div>
     </div>
-</header>
 
-<!-- Barra de categorías -->
-<div id="category-filters">
-    <div class="overflow-x-auto no-scrollbar">
-        <div class="flex items-center gap-2 sm:gap-3" id="category-pills"></div>
-    </div>
+    <!-- Contenido con scroll principal -->
+    <main id="content"></main>
+
 </div>
 
-<!-- ================================================ -->
-<!-- 🟢 REPRODUCTOR UNIVERSAL - PEGA AQUÍ TU CÓDIGO 🟢 -->
-<!-- ================================================ -->
-
-<!-- ================================================ -->
-
-<!-- Contenedor principal - SIN LÍMITES -->
-<main id="content">
-    <!-- Aquí se inyecta el contenido dinámico -->
-</main>
+<!-- Reproductor flotante -->
+<div id="floating-player" class="fixed bottom-0 left-0 right-0 bg-[#1a1a1a] border-t border-[#333] p-3 flex items-center justify-between z-[10000] backdrop-blur hidden">
+    <!-- Generado por player.js -->
+</div>
 
 <!-- Modal de error -->
 <div id="errorModal" class="fixed inset-0 z-[10000] flex items-center justify-center hidden" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(4px);">
@@ -251,28 +290,22 @@
     </div>
 </div>
 
-<!-- Botón flotante móvil -->
-<button id="openPlayerBtn" onclick="window.togglePlayer ? window.togglePlayer() : window.updatePlayerVisibility?.(true)" 
-        class="fixed bottom-20 right-4 z-[1002] bg-[#7b2eda] rounded-full p-3 shadow-lg flex items-center gap-2 lg:hidden">
-    <img src="https://nikichitonjes-home.odoo.com/web/image/478-0e3df8d3/reanudar.gif" alt="Reproductor" class="w-6 h-6">
-    <span class="text-sm font-bold">Escuchar</span>
-</button>
 
-<!-- Script de la barra lateral (simplificado, sin ajustes de layout manual) -->
-<script>
+<!-- Script sidebar -->
+<script type="module">
+import { episodios, getSerieById } from '/episodios.js';
+
 (function() {
-    const SIDEBAR_CONFIG = {
-        BREAKPOINT: 768,
-    };
-
+    const SIDEBAR_CONFIG = { BREAKPOINT: 768 };
     let sidebarInstance = {
         initialized: false,
         currentState: localStorage.getItem('sidebar_state') || 'collapsed',
         isMobile: window.innerWidth <= SIDEBAR_CONFIG.BREAKPOINT
     };
 
-    function getRecommendations() {
-        try { return window.RECOMENDADOS || []; } catch (e) { return []; }
+    function getRandomEpisodes(count = 12) {
+        const shuffled = [...episodios].sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, count);
     }
 
     function renderSidebar() {
@@ -324,48 +357,52 @@
         const container = document.getElementById('sidebarRecList');
         if (!container) return;
 
-        const episodes = getRecommendations();
+        container.innerHTML = '';
 
-        if (!episodes.length) {
-            container.innerHTML = '<div style="color:#aaa; padding:8px;">No hay recomendados</div>';
+        const selected = getRandomEpisodes(12);
+
+        if (!selected.length) {
+            container.innerHTML = '<div style="color:#aaa; padding:8px;">No hay episodios disponibles</div>';
             return;
         }
 
-        container.innerHTML = '';
-        episodes.forEach(ep => {
-            const title = ep.title || 'Sin título';
-            const author = ep.author || (ep.series?.titulo_serie) || 'Desconocido';
+        selected.forEach(ep => {
+            const serie = getSerieById(ep.seriesid) || {};
             const item = document.createElement('div');
             item.className = 'sidebar-rec-item';
             item.innerHTML = `
+                <img src="${serie.portada_serie || ep.coverUrl || 'https://via.placeholder.com/40'}" alt="${ep.title}" loading="lazy">
                 <div class="sidebar-rec-item-info">
-                    <div class="sidebar-rec-item-title">${title}</div>
-                    <div class="sidebar-rec-item-author">${author}</div>
+                    <div class="sidebar-rec-item-title">${ep.title}</div>
+                    <div class="sidebar-rec-item-author">${ep.author || serie.titulo_serie || '—'}</div>
                 </div>
-                <button class="sidebar-rec-play-btn" data-episode='${JSON.stringify(ep).replace(/'/g, "&#39;")}'>
+                <button class="sidebar-rec-play-btn" data-url="${ep.detailUrl || '#'}">
                     <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                 </button>
             `;
-            
-            const btn = item.querySelector('.sidebar-rec-play-btn');
-            btn.addEventListener('click', (e) => {
+
+            const btn = item.querySelector('button');
+            btn.addEventListener('click', e => {
+                e.preventDefault();
                 e.stopPropagation();
-                const epData = JSON.parse(btn.dataset.episode);
-                if (typeof window.playEpisodeExpanded === 'function') {
-                    window.playEpisodeExpanded(
-                        epData.mediaUrl || '',
-                        epData.type || 'audio',
-                        epData.coverUrl || '',
-                        epData.series?.portada_serie || epData.coverUrl || '',
-                        epData.title || '',
-                        epData.detailUrl || '',
-                        epData.author || (epData.series?.titulo_serie) || 'Roberto',
-                        epData.next || [],
-                        epData.description || '',
-                        true
-                    );
+                const url = btn.dataset.url;
+                if (url && url !== '#' && window.router) {
+                    window.history.pushState(null, null, url);
+                    window.router();
                 }
             });
+
+            item.addEventListener('click', e => {
+                if (e.target.tagName !== 'BUTTON') {
+                    e.preventDefault();
+                    const url = ep.detailUrl;
+                    if (url && url !== '#' && window.router) {
+                        window.history.pushState(null, null, url);
+                        window.router();
+                    }
+                }
+            });
+
             container.appendChild(item);
         });
     }
@@ -374,8 +411,8 @@
         const currentPath = window.location.pathname;
         document.querySelectorAll('.sidebar-nav-item').forEach(item => {
             const href = item.getAttribute('href');
-            item.classList.toggle('active', 
-                (href === currentPath) || 
+            item.classList.toggle('active',
+                (href === currentPath) ||
                 (href === '/' && currentPath === '/') ||
                 (href === '/buscar' && currentPath === '/buscar')
             );
@@ -389,11 +426,10 @@
 
         const newToggle = toggle.cloneNode(true);
         toggle.parentNode.replaceChild(newToggle, toggle);
-        
-        newToggle.addEventListener('click', (e) => {
+
+        newToggle.addEventListener('click', e => {
             e.stopPropagation();
             e.preventDefault();
-            
             const isCollapsed = sidebar.classList.contains('collapsed');
             if (isCollapsed) {
                 sidebar.classList.remove('collapsed');
@@ -408,21 +444,18 @@
 
     function initSidebar() {
         sidebarInstance.isMobile = window.innerWidth <= SIDEBAR_CONFIG.BREAKPOINT;
-        
         const oldSidebar = document.querySelector('.sidebar-desktop');
         if (oldSidebar) oldSidebar.remove();
-        
-        if (sidebarInstance.isMobile) {
-            return; // No sidebar en móvil
-        }
-        
+
+        if (sidebarInstance.isMobile) return;
+
         const sidebar = renderSidebar();
         document.body.insertBefore(sidebar, document.body.firstChild);
-        
+
         populateRecommendations();
         initSidebarToggle();
         setActiveNavItem();
-        
+
         sidebarInstance.initialized = true;
     }
 
@@ -435,7 +468,6 @@
     window.addEventListener('resize', () => {
         const wasMobile = sidebarInstance.isMobile;
         const isMobileNow = window.innerWidth <= SIDEBAR_CONFIG.BREAKPOINT;
-        
         if (wasMobile !== isMobileNow) {
             sidebarInstance.isMobile = isMobileNow;
             initSidebar();
@@ -466,6 +498,226 @@
 })();
 </script>
 
-<script type="module" src="/main.js"></script>
+<!-- Script principal (router + header scroll behavior CORREGIDO) -->
+<script type="module">
+    import { DATA, renderFeed, renderGrid, renderEpisodio, renderSerie, renderCategoryPills } from './show.js';
+    import { getEpisodioByDetailUrl, getSerieByUrl } from './episodios.js';
+    import './player.js';
+
+    const PAGES = [
+        { path: '/biblioteca', module: () => import('./biblioteca.js'), header: true },
+        { path: '/explorar', module: () => import('./explorar.js'), header: true },
+        { path: '/buscar', module: () => import('./buscar.js'), header: true }
+    ];
+
+    // === CONTROL PRECISO DEL HEADER (solo scroll del #content) ===
+    let lastScrollTop = 0;
+    let isHeaderVisible = true;
+    const SCROLL_THRESHOLD = 80;        // Distancia mínima para considerar ocultar
+    const SCROLL_DOWN_THRESHOLD = 15;    // Movimiento hacia abajo mínimo para ocultar
+    const SCROLL_UP_THRESHOLD = 5;       // Movimiento hacia arriba mínimo para mostrar
+
+    function updateActiveCategory() {
+        const path = window.location.pathname;
+        let activeCat = 'Todos';
+        if (path.startsWith('/categoria/')) {
+            activeCat = decodeURIComponent(path.replace('/categoria/', ''));
+        }
+        renderCategoryPills(activeCat);
+    }
+
+    async function router() {
+        const path = window.location.pathname;
+        const searchParams = new URLSearchParams(window.location.search);
+        const container = document.getElementById('content');
+        const headerContainer = document.getElementById('headerContainer');
+
+        try {
+            // Reset total al cambiar página
+            container.scrollTop = 0;
+            lastScrollTop = 0;
+            isHeaderVisible = true;
+            if (headerContainer) {
+                headerContainer.classList.remove('hidden');
+            }
+
+            if (path === '/') {
+                renderFeed(container);
+                document.title = 'Balta Media · Conocimiento en acción';
+            }
+            else if (path === '/novedades') {
+                const sorted = [...DATA].sort((a, b) => new Date(b.date) - new Date(a.date));
+                const recientes = sorted.slice(0, 20);
+                const aleatorios = [...DATA].sort(() => 0.5 - Math.random()).slice(0, 10);
+                const combined = [...new Set([...recientes, ...aleatorios])];
+
+                container.innerHTML = `
+                    <div class="mb-6 flex items-center justify-between">
+                        <h1 class="text-2xl font-bold">Novedades y Recomendaciones</h1>
+                        <button id="closeNovedadesBtn" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg text-sm font-medium transition">
+                            Volver al inicio
+                        </button>
+                    </div>
+                `;
+                const gridContainer = document.createElement('div');
+                gridContainer.id = 'novedades-grid';
+                container.appendChild(gridContainer);
+                renderGrid(gridContainer, combined, '');
+
+                document.title = 'Novedades · Balta Media';
+
+                document.getElementById('closeNovedadesBtn')?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.history.pushState(null, null, '/');
+                    router();
+                });
+            }
+            else {
+                const page = PAGES.find(p => p.path === path);
+                if (page) {
+                    const module = await page.module();
+                    if (page.path === '/buscar' && searchParams.has('q')) {
+                        const query = searchParams.get('q');
+                        if (module.renderSearch) module.renderSearch(container, query);
+                        else module.render(container);
+                    } else {
+                        module.render(container);
+                    }
+                    document.title = `${path.slice(1).charAt(0).toUpperCase() + path.slice(2)} · Balta Media`;
+                }
+                else if (path.startsWith('/categoria/')) {
+                    const cat = decodeURIComponent(path.replace('/categoria/', ''));
+                    const buscarModule = await import('./buscar.js');
+                    if (buscarModule.renderCategory) {
+                        buscarModule.renderCategory(container, cat);
+                    } else {
+                        const categoryEpisodes = DATA.filter(ep => ep.categories && ep.categories.includes(cat));
+                        renderGrid(container, categoryEpisodes, cat);
+                    }
+                    document.title = `${cat} · Balta Media`;
+                }
+                else {
+                    const serie = getSerieByUrl(path);
+                    if (serie) {
+                        renderSerie(container, path);
+                        document.title = `${serie.titulo_serie} · Balta Media`;
+                    } else {
+                        const episodio = getEpisodioByDetailUrl(path);
+                        if (episodio) {
+                            renderEpisodio(container, episodio.id);
+                            document.title = `${episodio.title} · Balta Media`;
+                        } else {
+                            const module404 = await import('./404.js');
+                            module404.render(container);
+                            document.title = 'Página no encontrada · Balta Media';
+                        }
+                    }
+                }
+            }
+
+            updateActiveCategory();
+            document.dispatchEvent(new Event('spa-navigation'));
+
+            if (window.sidebarAPI) {
+                if (path === '/' || path === '/novedades') window.sidebarAPI.refresh();
+                window.sidebarAPI.setActive();
+            }
+
+            if (window.updatePlayerVisibility) {
+                setTimeout(() => window.updatePlayerVisibility(), 50);
+            }
+
+        } catch (error) {
+            console.error('Error en router:', error);
+            container.innerHTML = `
+                <div class="flex flex-col items-center justify-center min-h-[50vh] text-center px-4">
+                    <span class="text-6xl mb-4">😵</span>
+                    <h2 class="text-2xl font-bold text-white mb-2">Algo salió mal</h2>
+                    <p class="text-gray-300 mb-6">${error.message || 'Error al cargar la página'}</p>
+                    <button onclick="window.history.pushState(null,null,'/'); router();"
+                            class="bg-[#7b2eda] hover:bg-[#8f3ef0] text-white font-bold px-6 py-3 rounded-full transition">
+                        Volver al inicio
+                    </button>
+                </div>
+            `;
+        }
+    }
+
+    // Navegación SPA
+    document.addEventListener('click', e => {
+        const link = e.target.closest('a[data-link]');
+        if (link) {
+            e.preventDefault();
+            const href = link.getAttribute('href');
+            if (href && !href.startsWith('http')) {
+                window.history.pushState(null, null, href);
+                router();
+            } else if (href) {
+                window.open(href, '_blank');
+            }
+        }
+    });
+
+    window.addEventListener('popstate', router);
+
+    // === SCROLL DEL CONTENIDO PRINCIPAL (solo #content) ===
+    const contentElement = document.getElementById('content');
+    if (contentElement) {
+        contentElement.addEventListener('scroll', () => {
+            const currentScroll = contentElement.scrollTop;
+            const headerContainer = document.getElementById('headerContainer');
+            if (!headerContainer) return;
+
+            // Siempre visible en el tope
+            if (currentScroll <= 10) {
+                if (!isHeaderVisible) {
+                    headerContainer.classList.remove('hidden');
+                    isHeaderVisible = true;
+                }
+                lastScrollTop = currentScroll;
+                return;
+            }
+
+            const delta = currentScroll - lastScrollTop;
+
+            // Solo actuar si hay movimiento significativo
+            if (Math.abs(delta) < 8) {
+                lastScrollTop = currentScroll;
+                return;
+            }
+
+            // Scroll hacia abajo
+            if (delta > SCROLL_DOWN_THRESHOLD && currentScroll > SCROLL_THRESHOLD) {
+                if (isHeaderVisible) {
+                    headerContainer.classList.add('hidden');
+                    isHeaderVisible = false;
+                }
+            } 
+            // Scroll hacia arriba
+            else if (delta < -SCROLL_UP_THRESHOLD) {
+                if (!isHeaderVisible) {
+                    headerContainer.classList.remove('hidden');
+                    isHeaderVisible = true;
+                }
+            }
+
+            lastScrollTop = currentScroll;
+        });
+    }
+
+    // Observer
+    const observer = new MutationObserver(() => {
+        if (window.sidebarAPI) window.sidebarAPI.setActive();
+        if (window.updatePlayerVisibility) window.updatePlayerVisibility();
+    });
+    if (contentElement) {
+        observer.observe(contentElement, { childList: true, subtree: true });
+    }
+
+    window.router = router;
+    router();
+    console.log('✅ Balta Media SPA – Header y filtros se ocultan/muestran juntos');
+</script>
+
 </body>
 </html>
