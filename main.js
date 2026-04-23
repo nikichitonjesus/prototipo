@@ -1,6 +1,6 @@
 // main.js - Router principal con soporte completo para búsqueda e integración con sidebar y reproductor
 import { DATA, renderFeed, renderGrid, renderEpisodio, renderSerie, renderCategoryPills } from './show.js';
-import { getEpisodioByDetailUrl, getSerieByUrl, getAllEpisodios } from './episodios.js';
+import { getEpisodioByDetailUrl, getSerieByUrl, getAllEpisodios } from './lib/episodios.js';
 import './player.js';
 
 // Páginas especiales
@@ -235,7 +235,11 @@ if (content) {
     });
 }
 
-// Inicializar
+// ========== INICIALIZACIÓN DEL LISTENER GLOBAL DE CLICS (extraído de show.js) ==========
+import { initGlobalClickHandler } from './show/events.js';
+initGlobalClickHandler();
+
+// Inicializar router
 router();
 
-console.log('✅ Main.js cargado correctamente con soporte para sidebar y reproductor persistente');
+console.log('✅ Main.js cargado correctamente con soporte para sidebar, reproductor persistente y eventos globales');
