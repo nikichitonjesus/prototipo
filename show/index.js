@@ -15,3 +15,5 @@ export { createCarousel, createSeriesCarousel, createRecommendedCarousel } from 
 
 // Las funciones globales ya se asignaron a window en grid.js, pero las re-exportamos
 export { shareContent, handlePlay, handleDl, handleAdd, goToDetail, handleCategoryClick } from './grid.js';
+import { initGlobalClickHandler } from './events.js';
+initGlobalClickHandler();
