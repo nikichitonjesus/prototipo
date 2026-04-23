@@ -57,14 +57,14 @@ body {
     top: 0; bottom: 0; z-index: 40; width: 60px;
     display: none; align-items: center; justify-content: center;
 }
-.nav-btn.left  { left: 0; background: linear-gradient(to right, #050505 0%, transparent 100%); }
-.nav-btn.right { right: 0; background: linear-gradient(to left, #050505 0%, transparent 100%); }
+.nav-btn.left  { left: 0; background: linear-gradient(to right, #1a2639 0%, transparent 100%); }
+.nav-btn.right { right: 0; background: linear-gradient(to left, #1a2639 0%, transparent 100%); }
 .nav-btn button {
     background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
     border-radius: 50%; width: 40px; height: 40px;
     border: 1px solid rgba(255,255,255,0.1); color: white; font-size: 20px;
 }
-.nav-btn button:hover { background: rgba(255,255,255,0.7); transform: scale(1.1); }
+.nav-btn button:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
 @media (min-width: 1024px) {
     .carousel-wrapper:hover .nav-btn { display: flex; }
 }
